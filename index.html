@@ -218,7 +218,7 @@ details p{margin:12px 0 0;color:var(--muted);max-width:60ch}
     <div class="item">
       <div class="item-row"><span>Brownie<small>Con nueces</small></span><i class="d"></i><span class="p">$3.00</span></div>
     </div>
-    <div class="item">
+    <div class="item" data-variants="Sabor: Clásico,Oreo,Maracuyá">
       <div class="item-row"><span>Cheesecake<small>Porción del día</small></span><i class="d"></i><span class="p">$4.25</span></div>
     </div>
   </div>
@@ -347,7 +347,6 @@ const st = document.createElement('style');
 st.textContent = '.sr2 label{display:block;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:#d6aa5c}.hn{color:rgba(243,231,211,.85);font-size:.85rem;line-height:1.4}';
 document.head.appendChild(st);
 
-/* ---------- UI base ---------- */
 document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => {
   document.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-selected', x === b));
   document.querySelectorAll('.list').forEach(l => l.classList.toggle('on', l.id === b.dataset.t));
@@ -367,7 +366,6 @@ document.querySelectorAll('.cnt').forEach(e => co.observe(e));
 let dk = matchMedia('(prefers-color-scheme: dark)').matches;
 document.querySelector('.tt').onclick = () => { dk = !dk; document.documentElement.setAttribute('data-theme', dk ? 'dark' : 'light'); };
 
-/* ---------- Reservas ---------- */
 const rg = $('rg'); $('rd').min = new Date().toISOString().slice(0, 10);
 rg.onclick = e => {
   const n = $('rn').value.trim(), d = $('rd').value;
@@ -376,7 +374,6 @@ rg.onclick = e => {
   rg.href = 'https://wa.me/' + WSP + '?text=' + encodeURIComponent('Hola Café Aroma, quiero reservar mesa a nombre de ' + n + ' para ' + $('rp').value + ' persona(s) el ' + d + ' a las ' + $('rh').value + '.');
 };
 
-/* ---------- Pedido ---------- */
 let cart = {}, sent = false, tipo = 'Para llevar', modo = 'Recoger en el local', mesa = '', pago = 'Efectivo', nota = '';
 const wa = document.querySelector('.wa'), bar = document.createElement('div');
 bar.className = 'bar';
@@ -443,7 +440,6 @@ sh.addEventListener('click', e => {
 bar.querySelector('.x').onclick = reset;
 $('bt').onclick = () => sh.classList.toggle('on');
 
-/* ---------- Productos con variantes ---------- */
 function bindItems() {
   document.querySelectorAll('.item').forEach(it => {
     if (it.querySelector('.add')) return;
@@ -472,7 +468,6 @@ function bindItems() {
 }
 bindItems();
 
-/* ---------- Envío (anti doble pedido) ---------- */
 go.addEventListener('click', e => {
   if (sent) { e.preventDefault(); return; }
   if (tipo == 'Para servir' && !mesa) { e.preventDefault(); sh.classList.add('on'); rs(); $('er').textContent = 'Elige tu número de mesa para continuar.'; return; }
@@ -484,10 +479,11 @@ go.addEventListener('click', e => {
   setTimeout(() => sh.classList.remove('on'), 1500);
 });
 
-/* ---------- Menú en Firestore + panel ---------- */
 let MENU = [], SEED = [], orders = [], live = false; const SV = {};
 const col = collection(db, 'menu'), oc = collection(db, 'orders');
 const fail = e => { console.error(e); $('pmsg').textContent = 'No se pudo guardar. Revisa tus permisos.'; };
+
+// Insertar campo de variantes en el panel de control
 $('nd').insertAdjacentHTML('afterend', '<input id="nv" placeholder="Variantes (ej. Sabor: Café,Oreo)">');
 
 document.querySelectorAll('.list').forEach(l => l.querySelectorAll('.item').forEach(it => {
@@ -529,11 +525,14 @@ function act(t) {
 }
 $('pm').onchange = e => { if (e.target.dataset.a && e.target.dataset.a != 'x') act(e.target); };
 $('pm').onclick = e => { if (e.target.dataset.a == 'x') act(e.target); };
+
 $('na').onclick = () => {
   const n = $('nn').value.trim(), p = parseFloat($('np').value); if (!n || !(p >= 0)) return;
-  ens().then(() => addDoc(col, { cat: $('nc').value, name: n, desc: $('nd').value.trim(), price: p, tag: '', variants: $('nv').value.trim(), out: false, o: Date.now() }))
+  const vInput = $('nv').value.trim() || SV[n] || '';
+  ens().then(() => addDoc(col, { cat: $('nc').value, name: n, desc: $('nd').value.trim(), price: p, tag: '', variants: vInput, out: false, o: Date.now() }))
     .then(() => { $('nn').value = $('nd').value = $('np').value = $('nv').value = ''; $('pmsg').textContent = ''; }).catch(fail);
 };
+
 $('ns').onclick = () => ens().then(() => { $('pmsg').textContent = 'Menú guardado en la base de datos.'; }).catch(fail);
 $('po').onclick = e => {
   const t = e.target, id = t.dataset.i; if (!id) return;
@@ -543,11 +542,14 @@ $('po').onclick = e => {
 
 onSnapshot(col, s => {
   live = s.docs.length > 0;
-  MENU = live ? s.docs.map(d => { const x = { ...d.data(), id: d.id }; if (x.variants === undefined) x.variants = SV[x.name] || ''; return x; }) : SEED.slice();
+  MENU = live ? s.docs.map(d => { 
+    const x = { ...d.data(), id: d.id }; 
+    if (!x.variants) x.variants = SV[x.name] || ''; 
+    return x; 
+  }) : SEED.slice();
   draw();
 }, e => console.error(e));
 
-/* ---------- Panel del dueño ---------- */
 if (new URLSearchParams(location.search).get('admin') === 'miapp123') {
   $('panel').classList.add('on'); $('pl').classList.add('on'); pm();
   onSnapshot(query(oc, orderBy('t', 'desc'), limit(30)), s => { orders = s.docs; po(); }, e => console.error(e));
