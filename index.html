@@ -133,7 +133,7 @@ details p{margin:12px 0 0;color:var(--muted);max-width:60ch}
 .item.out{opacity:.45}.item.out .add,.item.out .variant-box{display:none}.item.out small::after{content:" · Agotado"}
 #pl{display:none}#pl.on{display:inline}#panel{display:none}#panel.on{display:block}
 .pn{display:grid}.po,.pm{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 0;border-bottom:1px solid var(--line)}.po>div,.pm>span{flex:1;min-width:150px}
-.pm input[type=number],.pf input,.pf select{font:inherit;padding:9px 10px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:2px}.pm input[type=number]{width:88px}
+.pm input[type=number],.pm input[type=text],.pf input,.pf select{font:inherit;padding:9px 10px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:2px}.pm input[type=number]{width:88px}.pm input[type=text]{min-width:120px}
 .sm{font:inherit;font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--gold);background:none;color:var(--gold);padding:8px 14px;cursor:pointer}.sm:hover{background:var(--gold);color:var(--bg)}
 .pf{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}.pf input{flex:1;min-width:110px}
 .rv{opacity:0;transform:translateY(28px);transition:opacity .9s,transform .9s}.rv.in{opacity:1;transform:none}
@@ -293,7 +293,15 @@ details p{margin:12px 0 0;color:var(--muted);max-width:60ch}
   <p class="sub">Esto solo lo ves tú: pedidos en vivo, estado de envío y menú sincronizado.</p>
   <div class="card"><h3>Pedidos recibidos</h3><div id="po" class="pn"></div></div>
   <div class="card" style="margin-top:20px"><h3>Editar menú</h3><div id="pm"></div>
-    <div class="pf"><select id="nc"><option value="a">Café</option><option value="b">Cocina</option><option value="c">Bebidas</option></select><input id="nn" placeholder="Nombre"><input id="nd" placeholder="Descripción"><input id="np" type="number" step="0.25" placeholder="Precio"><button class="sm" id="na">Agregar</button></div>
+    <div class="pf">
+      <select id="nc"><option value="a">Café</option><option value="b">Cocina</option><option value="c">Bebidas</option></select>
+      <input id="nn" placeholder="Nombre">
+      <input id="nd" placeholder="Descripción">
+      <input id="nv" placeholder="Variantes (ej. Sabor: Coco,Queso,Chocolate)">
+      <input id="np" type="number" step="0.25" placeholder="Precio">
+      <button class="sm" id="na">Agregar</button>
+    </div>
+    <p style="margin:10px 0 0;color:var(--muted);font-size:.82rem">Formato de variantes: <code>Grupo: Opción1,Opción2 (+$0.50)</code>. Usa <code>|</code> para varios grupos. Ejemplo: <code>Sabor: Coco,Queso | Tamaño: P,G (+$1)</code></p>
     <div class="bts" style="margin-top:16px;align-items:center"><button class="sm" id="ns">Guardar menú inicial</button><span id="pmsg" style="color:var(--muted);font-size:.85rem"></span></div></div>
 </div></section>
 
@@ -483,9 +491,6 @@ let MENU = [], SEED = [], orders = [], live = false; const SV = {};
 const col = collection(db, 'menu'), oc = collection(db, 'orders');
 const fail = e => { console.error(e); $('pmsg').textContent = 'No se pudo guardar. Revisa tus permisos.'; };
 
-// Insertar campo de variantes en el panel de control
-$('nd').insertAdjacentHTML('afterend', '<input id="nv" placeholder="Variantes (ej. Sabor: Café,Oreo)">');
-
 document.querySelectorAll('.list').forEach(l => l.querySelectorAll('.item').forEach(it => {
   const r = it.querySelector('.item-row'), s = r.firstElementChild, tg = s.querySelector('.tg'), name = s.childNodes[0].textContent.trim(), v = it.dataset.variants || '';
   SV[name] = v;
@@ -495,7 +500,9 @@ SEED = MENU.slice();
 
 function pm() {
   $('pm').innerHTML = MENU.slice().sort((x, y) => x.o - y.o).map(m =>
-    '<div class="pm"><span>' + E(m.name) + '</span><input type="number" step="0.25" value="' + m.price + '" data-i="' + m.id + '" data-a="p" aria-label="Precio">' +
+    '<div class="pm"><span style="min-width:90px">' + E(m.name) + '</span>' +
+    '<input type="number" step="0.25" value="' + m.price + '" data-i="' + m.id + '" data-a="p" aria-label="Precio" title="Precio">' +
+    '<input type="text" value="' + E(m.variants || '') + '" data-i="' + m.id + '" data-a="v" placeholder="Variantes (Sabor: Coco,Queso)" style="flex:1.4;min-width:140px" aria-label="Variantes" title="Variantes">' +
     '<label><input type="checkbox" data-i="' + m.id + '" data-a="o"' + (m.out ? ' checked' : '') + '> Agotado</label>' +
     '<button class="sm" data-i="' + m.id + '" data-a="x">Borrar</button></div>').join('');
 }
@@ -520,17 +527,21 @@ function po() {
 const ens = () => live ? Promise.resolve() : Promise.all(SEED.map(m => setDoc(doc(db, 'menu', m.id), m))).then(() => { live = true; });
 function act(t) {
   const id = t.dataset.i, a = t.dataset.a, m = MENU.find(x => x.id == id); if (!m) return;
+  const patch = a == 'p' ? { price: parseFloat(t.value) || m.price }
+              : a == 'v' ? { variants: t.value.trim() }
+              : a == 'o' ? { out: t.checked }
+              : null;
   ens().then(() => a == 'x' ? deleteDoc(doc(db, 'menu', id)) :
-    setDoc(doc(db, 'menu', id), { ...m, ...(a == 'p' ? { price: parseFloat(t.value) || m.price } : { out: t.checked }) })).catch(fail);
+    patch ? setDoc(doc(db, 'menu', id), { ...m, ...patch }) : null).catch(fail);
 }
 $('pm').onchange = e => { if (e.target.dataset.a && e.target.dataset.a != 'x') act(e.target); };
 $('pm').onclick = e => { if (e.target.dataset.a == 'x') act(e.target); };
 
 $('na').onclick = () => {
   const n = $('nn').value.trim(), p = parseFloat($('np').value); if (!n || !(p >= 0)) return;
-  const vInput = $('nv').value.trim() || SV[n] || '';
+  const vInput = ($('nv') && $('nv').value.trim()) || SV[n] || '';
   ens().then(() => addDoc(col, { cat: $('nc').value, name: n, desc: $('nd').value.trim(), price: p, tag: '', variants: vInput, out: false, o: Date.now() }))
-    .then(() => { $('nn').value = $('nd').value = $('np').value = $('nv').value = ''; $('pmsg').textContent = ''; }).catch(fail);
+    .then(() => { $('nn').value = $('nd').value = $('np').value = ''; if ($('nv')) $('nv').value = ''; $('pmsg').textContent = 'Producto agregado.'; }).catch(fail);
 };
 
 $('ns').onclick = () => ens().then(() => { $('pmsg').textContent = 'Menú guardado en la base de datos.'; }).catch(fail);
