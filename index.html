@@ -9,7 +9,7 @@
 <meta property="og:description" content="Café de origen, momentos con alma. Mira el menú y haz tu pedido por WhatsApp.">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#140d09">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"CafeOrCoffeeShop","name":"Café Aroma","description":"Cafetería de especialidad con café de origen y repostería casera.","address":{"@type":"PostalAddress","streetAddress":"Calle Principal 123","addressLocality":"Centro"},"telephone":"+00000000000","priceRange":"$$","servesCuisine":"Café, repostería","openingHours":["Mo-Fr 07:00-20:00","Sa 08:00-21:00","Su 09:00-15:00"]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"CafeOrCoffeeShop","name":"Café Aroma","description":"Cafetería de especialidad con café de origen y repostería casera.","address":{"@type":"PostalAddress","streetAddress":"Calle Principal 123","addressLocality":"Centro"},"telephone":"+593984807355","priceRange":"$$","servesCuisine":"Café, repostería","openingHours":["Mo-Fr 07:00-20:00","Sa 08:00-21:00","Su 09:00-15:00"]}</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,500&family=Inter:wght@400;500;600&display=swap">
 <style>
 :root{--bg:#f7f1e7;--surface:#fffaf2;--text:#1f1510;--muted:#7b6757;--gold:#a8782d;--line:#e3d6c2;--hero:#140d09;--cream:#f3e7d3;
@@ -283,7 +283,7 @@ details p{margin:12px 0 0;color:var(--muted);max-width:60ch}
 </div></section>
 
 <footer><b>Café Aroma</b><div class="soc"><a href="https://instagram.com/cafearoma" target="_blank" rel="noopener">Instagram</a><a href="https://facebook.com/cafearoma" target="_blank" rel="noopener">Facebook</a><a href="https://tiktok.com/@cafearoma" target="_blank" rel="noopener">TikTok</a></div>© 2026 · Hecho con cariño y mucho café</footer>
-<a class="wa" href="https://wa.me/0000000000" target="_blank" rel="noopener">Pedir por WhatsApp</a>
+<a class="wa" href="https://wa.me/593984807355" target="_blank" rel="noopener">Pedir por WhatsApp</a>
 
 <!-- SDKs de Firebase -->
 <script type="module">
@@ -314,7 +314,7 @@ details p{margin:12px 0 0;color:var(--muted);max-width:60ch}
   document.querySelectorAll('.cnt').forEach(function(e){co.observe(e)});
   
   var cart={},wa=document.querySelector('.wa'),bar=document.createElement('div');bar.className='bar';bar.innerHTML='<span id="bt"></span><span style="display:flex;align-items:center"><button class="x" aria-label="Vaciar pedido">✕</button><a class="go" target="_blank" rel="noopener">Enviar pedido</a></span>';document.body.appendChild(bar);
-  function up(){var q=0,t=0,l=[];for(var k in cart){q+=cart[k].q;t+=cart[k].q*cart[k].p;l.push(cart[k].q+'× '+k)}bar.querySelector('#bt').textContent=q+' · $'+t.toFixed(2);bar.querySelector('.go').href='https://wa.me/0000000000?text='+encodeURIComponent('Hola Café Aroma, quiero pedir:\n'+l.join('\n')+'\nTotal: $'+t.toFixed(2));bar.classList.toggle('on',q>0);wa.classList.toggle('hide',q>0);if(!q)sh.classList.remove('on');rs()}
+  function up(){var q=0,t=0,l=[];for(var k in cart){q+=cart[k].q;t+=cart[k].q*cart[k].p;l.push(cart[k].q+'× '+k)}bar.querySelector('#bt').textContent=q+' · $'+t.toFixed(2);bar.querySelector('.go').href='https://wa.me/593984807355?text='+encodeURIComponent('Hola Café Aroma, quiero pedir:\n'+l.join('\n')+'\nTotal: $'+t.toFixed(2));bar.classList.toggle('on',q>0);wa.classList.toggle('hide',q>0);if(!q)sh.classList.remove('on');rs()}
   bar.querySelector('.x').onclick=function(){cart={};up()};
   window.bindItems = function(){document.querySelectorAll('.item').forEach(function(it){if(it.querySelector('.add'))return;var n=it.firstElementChild.childNodes[0].textContent.trim(),p=it.querySelector('.p'),pr=parseFloat(p.textContent.replace('$','')),r=document.createElement('div'),b=document.createElement('button');r.className='r';b.className='add';b.textContent='+';b.setAttribute('aria-label','Agregar '+n);p.replaceWith(r);r.appendChild(p);r.appendChild(b);b.onclick=function(){cart[n]=cart[n]||{q:0,p:pr};cart[n].q++;up()}});}
   bindItems();
@@ -326,7 +326,7 @@ details p{margin:12px 0 0;color:var(--muted);max-width:60ch}
   bar.querySelector('#bt').onclick=function(){sh.classList.toggle('on')};
   
   var $=function(i){return document.getElementById(i)},rg=$('rg');$('rd').min=new Date().toISOString().slice(0,10);
-  rg.onclick=function(e){var n=$('rn').value.trim(),d=$('rd').value;if(!n||!d){e.preventDefault();$('rm').textContent='Escribe tu nombre y elige una fecha.';return}$('rm').textContent='';rg.target='_blank';rg.href='https://wa.me/0000000000?text='+encodeURIComponent('Hola Café Aroma, quiero reservar mesa a nombre de '+n+' para '+$('rp').value+' persona(s) el '+d+' a las '+$('rh').value+'.')};
+  rg.onclick=function(e){var n=$('rn').value.trim(),d=$('rd').value;if(!n||!d){e.preventDefault();$('rm').textContent='Escribe tu nombre y elige una fecha.';return}$('rm').textContent='';rg.target='_blank';rg.href='https://wa.me/593984807355?text='+encodeURIComponent('Hola Café Aroma, quiero reservar mesa a nombre de '+n+' para '+$('rp').value+' persona(s) el '+d+' a las '+$('rh').value+'.')};
   var dk=matchMedia('(prefers-color-scheme: dark)').matches;document.querySelector('.tt').onclick=function(){dk=!dk;document.documentElement.setAttribute('data-theme',dk?'dark':'light')};
 
   // Lógica de Firestore (Menú y Panel de Control protegido por URL secreta)
@@ -362,7 +362,7 @@ details p{margin:12px 0 0;color:var(--muted);max-width:60ch}
     draw();
   }, function(e){ console.error(e); });
 
-  // Verificación de Administrador por URL Secreta (ej: tu-web.github.io/repo/?admin=miapp123)
+  // Verificación de Administrador por URL Secreta
   var urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('admin') === 'miapp123') {
     own = true;
