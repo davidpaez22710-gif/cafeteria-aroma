@@ -249,9 +249,9 @@ details p{margin:12px 0 0;color:var(--muted);max-width:60ch}
 </div></section>
 
 <section id="panel" style="padding-top:0"><div class="wrap">
-  <div class="ey">Modo dueño · demo</div>
+  <div class="ey">Modo dueño · Firebase</div>
   <h2>Panel de <em>control</em></h2>
-  <p class="sub">Esto solo lo ve el dueño: pedidos en vivo y menú editable sin tocar código. Los cambios se guardan en una base de datos y se reflejan al instante en la página.</p>
+  <p class="sub">Esto solo lo ves tú: pedidos en vivo y menú editable sin tocar código. Los cambios se sincronizan al instante en la base de datos.</p>
   <div class="card"><h3>Pedidos recibidos</h3><div id="po" class="pn"></div></div>
   <div class="card" style="margin-top:20px"><h3>Editar menú</h3><div id="pm"></div>
     <div class="pf"><select id="nc"><option value="a">Café</option><option value="b">Cocina</option><option value="c">Bebidas</option></select><input id="nn" placeholder="Nombre"><input id="nd" placeholder="Descripción"><input id="np" type="number" step="0.25" placeholder="Precio"><button class="sm" id="na">Agregar</button></div>
@@ -285,50 +285,96 @@ details p{margin:12px 0 0;color:var(--muted);max-width:60ch}
 <footer><b>Café Aroma</b><div class="soc"><a href="https://instagram.com/cafearoma" target="_blank" rel="noopener">Instagram</a><a href="https://facebook.com/cafearoma" target="_blank" rel="noopener">Facebook</a><a href="https://tiktok.com/@cafearoma" target="_blank" rel="noopener">TikTok</a></div>© 2026 · Hecho con cariño y mucho café</footer>
 <a class="wa" href="https://wa.me/0000000000" target="_blank" rel="noopener">Pedir por WhatsApp</a>
 
-<script>
-document.querySelectorAll('.tabs button').forEach(function(b){b.addEventListener('click',function(){
-document.querySelectorAll('.tabs button').forEach(function(x){x.setAttribute('aria-selected',x===b)});
-document.querySelectorAll('.list').forEach(function(l){l.classList.toggle('on',l.id===b.dataset.t)})})});
-var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.1});
-document.querySelectorAll('.rv').forEach(function(e){io.observe(e)});
-(function(){var d=new Date(),h=d.getHours()+d.getMinutes()/60,w=d.getDay(),s=w==0?[9,15]:w==6?[8,21]:[7,20],o=h>=s[0]&&h<s[1];document.getElementById('op').textContent=o?'● Abierto ahora':'○ Cerrado ahora'})();
-var co=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;co.unobserve(e.target);var el=e.target,n=+el.dataset.n,p=el.dataset.p||'',dec=n%1?1:0,t0=null;function f(t){t0=t0||t;var k=Math.min((t-t0)/1400,1),v=n*(1-Math.pow(1-k,3));el.textContent=p+v.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});if(k<1)requestAnimationFrame(f)}requestAnimationFrame(f)})},{threshold:.5});
-document.querySelectorAll('.cnt').forEach(function(e){co.observe(e)});
-var cart={},wa=document.querySelector('.wa'),bar=document.createElement('div');bar.className='bar';bar.innerHTML='<span id="bt"></span><span style="display:flex;align-items:center"><button class="x" aria-label="Vaciar pedido">✕</button><a class="go" target="_blank" rel="noopener">Enviar pedido</a></span>';document.body.appendChild(bar);
-function up(){var q=0,t=0,l=[];for(var k in cart){q+=cart[k].q;t+=cart[k].q*cart[k].p;l.push(cart[k].q+'× '+k)}bar.querySelector('#bt').textContent=q+' · $'+t.toFixed(2);bar.querySelector('.go').href='https://wa.me/0000000000?text='+encodeURIComponent('Hola Café Aroma, quiero pedir:\n'+l.join('\n')+'\nTotal: $'+t.toFixed(2));bar.classList.toggle('on',q>0);wa.classList.toggle('hide',q>0);if(!q)sh.classList.remove('on');rs()}
-bar.querySelector('.x').onclick=function(){cart={};up()};
-function bindItems(){document.querySelectorAll('.item').forEach(function(it){if(it.querySelector('.add'))return;var n=it.firstElementChild.childNodes[0].textContent.trim(),p=it.querySelector('.p'),pr=parseFloat(p.textContent.replace('$','')),r=document.createElement('div'),b=document.createElement('button');r.className='r';b.className='add';b.textContent='+';b.setAttribute('aria-label','Agregar '+n);p.replaceWith(r);r.appendChild(p);r.appendChild(b);b.onclick=function(){cart[n]=cart[n]||{q:0,p:pr};cart[n].q++;up()}});}bindItems();
-var ot='Para llevar',nt='',sh=document.createElement('div');sh.className='sheet';document.body.appendChild(sh);
-function rs(){var h='<h3>Tu pedido</h3>';for(var k in cart){var c=cart[k];h+='<div class="sr"><span>'+k+'</span><span class="qt"><button data-k="'+k+'" data-d="-1" aria-label="Quitar uno">−</button>'+c.q+'<button data-k="'+k+'" data-d="1" aria-label="Agregar uno">+</button></span><b>$'+(c.q*c.p).toFixed(2)+'</b></div>'}h+='<div class="sr2"><select id="ot"><option>Para llevar</option><option>Comer en el local</option></select><input id="nt" placeholder="Nota (ej. sin azúcar)"></div>';sh.innerHTML=h;sh.querySelector('#ot').value=ot;sh.querySelector('#nt').value=nt}
-sh.onclick=function(e){var b=e.target.closest('button[data-k]');if(!b)return;var c=cart[b.dataset.k];c.q+=+b.dataset.d;if(c.q<1)delete cart[b.dataset.k];up()};
-sh.oninput=function(e){if(e.target.id=='nt')nt=e.target.value};sh.onchange=function(e){if(e.target.id=='ot')ot=e.target.value};
-bar.querySelector('#bt').onclick=function(){sh.classList.toggle('on')};
-bar.querySelector('.go').addEventListener('click',function(){var l=[],t=0;for(var k in cart){l.push(cart[k].q+'× '+k);t+=cart[k].q*cart[k].p}this.href='https://wa.me/0000000000?text='+encodeURIComponent('Hola Café Aroma, quiero pedir ('+ot+'):\n'+l.join('\n')+(nt?'\nNota: '+nt:'')+'\nTotal: $'+t.toFixed(2))});
-var $=function(i){return document.getElementById(i)},rg=$('rg');$('rd').min=new Date().toISOString().slice(0,10);
-rg.onclick=function(e){var n=$('rn').value.trim(),d=$('rd').value;if(!n||!d){e.preventDefault();$('rm').textContent='Escribe tu nombre y elige una fecha.';return}$('rm').textContent='';rg.target='_blank';rg.href='https://wa.me/0000000000?text='+encodeURIComponent('Hola Café Aroma, quiero reservar mesa a nombre de '+n+' para '+$('rp').value+' persona(s) el '+d+' a las '+$('rh').value+'.')};
-var dk=matchMedia('(prefers-color-scheme: dark)').matches;document.querySelector('.tt').onclick=function(){dk=!dk;document.documentElement.setAttribute('data-theme',dk?'dark':'light')};
-(function(){
-var MENU=[],SEED,orders=[],own=false,col=null,oc=null,live=false;
-function E(x){return String(x).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-function fail(e){console.error(e);$('pmsg').textContent='No se pudo guardar. Revisa tus permisos.'}
-document.querySelectorAll('.list').forEach(function(l){l.querySelectorAll('.item').forEach(function(it){var s=it.firstElementChild,tg=s.querySelector('.tg');MENU.push({id:'m'+MENU.length,cat:l.id,name:s.childNodes[0].textContent.trim(),desc:s.querySelector('small').textContent,price:parseFloat(it.querySelector('.p').textContent.replace('$','')),tag:tg?tg.textContent:'',out:false,o:MENU.length})})});
-SEED=MENU.slice();
-function pm(){if(!own)return;$('pm').innerHTML=MENU.slice().sort(function(x,y){return x.o-y.o}).map(function(m){return'<div class="pm"><span>'+E(m.name)+'</span><input type="number" step="0.25" value="'+m.price+'" data-i="'+m.id+'" data-a="p" aria-label="Precio"><label><input type="checkbox" data-i="'+m.id+'" data-a="o"'+(m.out?' checked':'')+'> Agotado</label><button class="sm" data-i="'+m.id+'" data-a="x">Borrar</button></div>'}).join('')}
-function draw(){['a','b','c'].forEach(function(c){$(c).innerHTML=MENU.filter(function(m){return m.cat==c}).sort(function(x,y){return x.o-y.o}).map(function(m){return'<div class="item'+(m.out?' out':'')+'"><span>'+E(m.name)+'<small>'+E(m.desc)+'</small>'+(m.tag?'<em class="tg">'+E(m.tag)+'</em>':'')+'</span><i class="d"></i><span class="p">$'+Number(m.price).toFixed(2)+'</span></div>'}).join('')});bindItems();pm()}
-function po(){$('po').innerHTML=orders.length?orders.map(function(d){var o=d.data();return'<div class="po"><div><b>'+E(o.type)+'</b> · $'+Number(o.total).toFixed(2)+'<br><small style="color:var(--muted)">'+E(o.items)+(o.note?' · Nota: '+E(o.note):'')+'</small></div><span>'+new Date(o.t).toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'})+(o.done?' ✓':'')+'</span><button class="sm" data-i="'+d.id+'" data-a="d">'+(o.done?'Reabrir':'Listo')+'</button><button class="sm" data-i="'+d.id+'" data-a="x">Borrar</button></div>'}).join(''):'<small style="color:var(--muted)">Aún no hay pedidos. Arma uno en el menú y envíalo: aparecerá aquí al instante.</small>'}
-function ens(){if(live)return Promise.resolve();return Promise.all(SEED.map(function(m){return col.doc(m.id).set(m)})).then(function(){live=true})}
-function act(t){var id=t.dataset.i,a=t.dataset.a,m=MENU.filter(function(x){return x.id==id})[0];if(!m)return;ens().then(function(){return a=='x'?col.doc(id).delete():col.doc(id).set(Object.assign({},m,a=='p'?{price:parseFloat(t.value)||m.price}:{out:t.checked}))}).catch(fail)}
-$('pm').onchange=function(e){if(e.target.dataset.a&&e.target.dataset.a!='x')act(e.target)};
-$('pm').onclick=function(e){if(e.target.dataset.a=='x')act(e.target)};
-$('na').onclick=function(){var n=$('nn').value.trim(),p=parseFloat($('np').value);if(!n||!(p>=0))return;ens().then(function(){return col.add({cat:$('nc').value,name:n,desc:$('nd').value.trim(),price:p,tag:'',out:false,o:Date.now()})}).then(function(){$('nn').value=$('nd').value=$('np').value='';$('pmsg').textContent=''}).catch(fail)};
-$('ns').onclick=function(){ens().then(function(){$('pmsg').textContent='Menú guardado en la base de datos.'}).catch(fail)};
-$('po').onclick=function(e){var t=e.target,id=t.dataset.i;if(!id||!oc)return;var d=orders.filter(function(x){return x.id==id})[0];(t.dataset.a=='x'?oc.doc(id).delete():oc.doc(id).update({done:!d.data().done})).catch(fail)};
-document.querySelector('.bar .go').addEventListener('click',function(){if(!oc)return;var l=[],t=0;for(var k in cart){l.push(cart[k].q+'× '+k);t+=cart[k].q*cart[k].p}if(!l.length)return;oc.add({t:Date.now(),type:ot,note:nt,items:l.join(', '),total:t,done:false}).catch(function(){})});
-if(window.claude&&claude.use){claude.use('db').then(function(db){if(!db)return;col=db.collection('menu');oc=db.collection('orders');
-col.onSnapshot(function(s){live=s.docs.length>0;MENU=live?s.docs.map(function(d){return Object.assign({},d.data(),{id:d.id})}):SEED.slice();draw()},function(){});
-return claude.use('user').then(function(u){own=!!(u&&u.canEdit());if(!own)return;$('panel').classList.add('on');$('pl').classList.add('on');pm();oc.orderBy('t','desc').limit(30).onSnapshot(function(s){orders=s.docs;po()},function(){});po()})}).catch(function(e){console.error(e)})}
-})();
+<!-- SDKs de Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc, addDoc, updateDoc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
 
+  const firebaseConfig = {
+    apiKey: "AIzaSyBEN6C9n8rp4SzBXUqdZ4gvdUT9AMkenNQ",
+    authDomain: "project-4727667411944145468.firebaseapp.com",
+    projectId: "project-4727667411944145468",
+    storageBucket: "project-4727667411944145468.firebasestorage.app",
+    messagingSenderId: "101365607472",
+    appId: "1:101365607472:web:9337e221d3ea7c053611f5",
+    measurementId: "G-P7PLS0ZDX7"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Funcionalidad base de la interfaz (Tabs, contadores, carrito, reservas)
+  document.querySelectorAll('.tabs button').forEach(function(b){b.addEventListener('click',function(){
+  document.querySelectorAll('.tabs button').forEach(function(x){x.setAttribute('aria-selected',x===b)});
+  document.querySelectorAll('.list').forEach(function(l){l.classList.toggle('on',l.id===b.dataset.t)})})});
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.1});
+  document.querySelectorAll('.rv').forEach(function(e){io.observe(e)});
+  (function(){var d=new Date(),h=d.getHours()+d.getMinutes()/60,w=d.getDay(),s=w==0?[9,15]:w==6?[8,21]:[7,20],o=h>=s[0]&&h<s[1];document.getElementById('op').textContent=o?'● Abierto ahora':'○ Cerrado ahora'})();
+  var co=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;co.unobserve(e.target);var el=e.target,n=+el.dataset.n,p=el.dataset.p||'',dec=n%1?1:0,t0=null;function f(t){t0=t0||t;var k=Math.min((t-t0)/1400,1),v=n*(1-Math.pow(1-k,3));el.textContent=p+v.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});if(k<1)requestAnimationFrame(f)}requestAnimationFrame(f)})},{threshold:.5});
+  document.querySelectorAll('.cnt').forEach(function(e){co.observe(e)});
+  
+  var cart={},wa=document.querySelector('.wa'),bar=document.createElement('div');bar.className='bar';bar.innerHTML='<span id="bt"></span><span style="display:flex;align-items:center"><button class="x" aria-label="Vaciar pedido">✕</button><a class="go" target="_blank" rel="noopener">Enviar pedido</a></span>';document.body.appendChild(bar);
+  function up(){var q=0,t=0,l=[];for(var k in cart){q+=cart[k].q;t+=cart[k].q*cart[k].p;l.push(cart[k].q+'× '+k)}bar.querySelector('#bt').textContent=q+' · $'+t.toFixed(2);bar.querySelector('.go').href='https://wa.me/0000000000?text='+encodeURIComponent('Hola Café Aroma, quiero pedir:\n'+l.join('\n')+'\nTotal: $'+t.toFixed(2));bar.classList.toggle('on',q>0);wa.classList.toggle('hide',q>0);if(!q)sh.classList.remove('on');rs()}
+  bar.querySelector('.x').onclick=function(){cart={};up()};
+  window.bindItems = function(){document.querySelectorAll('.item').forEach(function(it){if(it.querySelector('.add'))return;var n=it.firstElementChild.childNodes[0].textContent.trim(),p=it.querySelector('.p'),pr=parseFloat(p.textContent.replace('$','')),r=document.createElement('div'),b=document.createElement('button');r.className='r';b.className='add';b.textContent='+';b.setAttribute('aria-label','Agregar '+n);p.replaceWith(r);r.appendChild(p);r.appendChild(b);b.onclick=function(){cart[n]=cart[n]||{q:0,p:pr};cart[n].q++;up()}});}
+  bindItems();
+  
+  var ot='Para llevar',nt='',sh=document.createElement('div');sh.className='sheet';document.body.appendChild(sh);
+  function rs(){var h='<h3>Tu pedido</h3>';for(var k in cart){var c=cart[k];h+='<div class="sr"><span>'+k+'</span><span class="qt"><button data-k="'+k+'" data-d="-1" aria-label="Quitar uno">−</button>'+c.q+'<button data-k="'+k+'" data-d="1" aria-label="Agregar uno">+</button></span><b>$'+(c.q*c.p).toFixed(2)+'</b></div>'}h+='<div class="sr2"><select id="ot"><option>Para llevar</option><option>Comer en el local</option></select><input id="nt" placeholder="Nota (ej. sin azúcar)"></div>';sh.innerHTML=h;sh.querySelector('#ot').value=ot;sh.querySelector('#nt').value=nt}
+  sh.onclick=function(e){var b=e.target.closest('button[data-k]');if(!b)return;var c=cart[b.dataset.k];c.q+=+b.dataset.d;if(c.q<1)delete cart[b.dataset.k];up()};
+  sh.oninput=function(e){if(e.target.id=='nt')nt=e.target.value};sh.onchange=function(e){if(e.target.id=='ot')ot=e.target.value};
+  bar.querySelector('#bt').onclick=function(){sh.classList.toggle('on')};
+  
+  var $=function(i){return document.getElementById(i)},rg=$('rg');$('rd').min=new Date().toISOString().slice(0,10);
+  rg.onclick=function(e){var n=$('rn').value.trim(),d=$('rd').value;if(!n||!d){e.preventDefault();$('rm').textContent='Escribe tu nombre y elige una fecha.';return}$('rm').textContent='';rg.target='_blank';rg.href='https://wa.me/0000000000?text='+encodeURIComponent('Hola Café Aroma, quiero reservar mesa a nombre de '+n+' para '+$('rp').value+' persona(s) el '+d+' a las '+$('rh').value+'.')};
+  var dk=matchMedia('(prefers-color-scheme: dark)').matches;document.querySelector('.tt').onclick=function(){dk=!dk;document.documentElement.setAttribute('data-theme',dk?'dark':'light')};
+
+  // Lógica de Firestore (Menú y Panel de Control protegido por URL secreta)
+  var MENU=[],SEED=[],orders=[],own=false,col=null,oc=null,live=false;
+  function E(x){return String(x).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function fail(e){console.error(e);$('pmsg').textContent='No se pudo guardar. Revisa tus permisos.'}
+  
+  document.querySelectorAll('.list').forEach(function(l){l.querySelectorAll('.item').forEach(function(it){var s=it.firstElementChild,tg=s.querySelector('.tg');MENU.push({id:'m'+MENU.length,cat:l.id,name:s.childNodes[0].textContent.trim(),desc:s.querySelector('small').textContent,price:parseFloat(it.querySelector('.p').textContent.replace('$','')),tag:tg?tg.textContent:'',out:false,o:MENU.length})})});
+  SEED=MENU.slice();
+  
+  function pm(){if(!own)return;$('pm').innerHTML=MENU.slice().sort(function(x,y){return x.o-y.o}).map(function(m){return'<div class="pm"><span>'+E(m.name)+'</span><input type="number" step="0.25" value="'+m.price+'" data-i="'+m.id+'" data-a="p" aria-label="Precio"><label><input type="checkbox" data-i="'+m.id+'" data-a="o"'+(m.out?' checked':'')+'> Agotado</label><button class="sm" data-i="'+m.id+'" data-a="x">Borrar</button></div>'}).join('')}
+  function draw(){['a','b','c'].forEach(function(c){$(c).innerHTML=MENU.filter(function(m){return m.cat==c}).sort(function(x,y){return x.o-y.o}).map(function(m){return'<div class="item'+(m.out?' out':'')+'"><span>'+E(m.name)+'<small>'+E(m.desc)+'</small>'+(m.tag?'<em class="tg">'+E(m.tag)+'</em>':'')+'</span><i class="d"></i><span class="p">$'+Number(m.price).toFixed(2)+'</span></div>'}).join('')});bindItems();pm()}
+  function po(){$('po').innerHTML=orders.length?orders.map(function(d){var o=d.data();return'<div class="po"><div><b>'+E(o.type)+'</b> · $'+Number(o.total).toFixed(2)+'<br><small style="color:var(--muted)">'+E(o.items)+(o.note?' · Nota: '+E(o.note):'')+'</small></div><span>'+new Date(o.t).toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'})+(o.done?' ✓':'')+'</span><button class="sm" data-i="'+d.id+'" data-a="d">'+(o.done?'Reabrir':'Listo')+'</button><button class="sm" data-i="'+d.id+'" data-a="x">Borrar</button></div>'}).join(''):'<small style="color:var(--muted)">Aún no hay pedidos. Arma uno en el menú y envíalo: aparecerá aquí al instante.</small>'}
+  function ens(){if(live)return Promise.resolve();return Promise.all(SEED.map(function(m){return setDoc(doc(db, "menu", m.id), m)})).then(function(){live=true})}
+  
+  function act(t){var id=t.dataset.i,a=t.dataset.a,m=MENU.filter(function(x){return x.id==id})[0];if(!m)return;ens().then(function(){return a=='x'?deleteDoc(doc(db, "menu", id)):setDoc(doc(db, "menu", id), Object.assign({},m,a=='p'?{price:parseFloat(t.value)||m.price}:{out:t.checked}))}).catch(fail)}
+  
+  document.getElementById('pm').onchange=function(e){if(e.target.dataset.a&&e.target.dataset.a!='x')act(e.target)};
+  document.getElementById('pm').onclick=function(e){if(e.target.dataset.a=='x')act(e.target)};
+  document.getElementById('na').onclick=function(){var n=$('nn').value.trim(),p=parseFloat($('np').value);if(!n||!(p>=0))return;ens().then(function(){return addDoc(collection(db, "menu"),{cat:$('nc').value,name:n,desc:$('nd').value.trim(),price:p,tag:'',out:false,o:Date.now()})}).then(function(){$('nn').value=$('nd').value=$('np').value='';$('pmsg').textContent=''}).catch(fail)};
+  document.getElementById('ns').onclick=function(){ens().then(function(){$('pmsg').textContent='Menú guardado en la base de datos.'}).catch(fail)};
+  document.getElementById('po').onclick=function(e){var t=e.target,id=t.dataset.i;if(!id||!oc)return;var d=orders.filter(function(x){return x.id==id})[0];(t.dataset.a=='x'?deleteDoc(doc(db, "orders", id)):updateDoc(doc(db, "orders", id),{done:!d.data().done})).catch(fail)};
+  
+  document.querySelector('.bar .go').addEventListener('click',function(){if(!oc)return;var l=[],t=0;for(var k in cart){l.push(cart[k].q+'× '+k);t+=cart[k].q*cart[k].p}if(!l.length)return;addDoc(collection(db, "orders"),{t:Date.now(),type:ot,note:nt,items:l.join(', '),total:t,done:false}).catch(function(){})});
+
+  // Conexión a Firestore
+  col = collection(db, "menu");
+  oc = collection(db, "orders");
+
+  onSnapshot(col, function(s){
+    live = s.docs.length > 0;
+    MENU = live ? s.docs.map(function(d){return Object.assign({},d.data(),{id:d.id})}) : SEED.slice();
+    draw();
+  }, function(e){ console.error(e); });
+
+  // Verificación de Administrador por URL Secreta (ej: tu-web.github.io/repo/?admin=miapp123)
+  var urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('admin') === 'miapp123') {
+    own = true;
+    $('panel').classList.add('on');
+    $('pl').classList.add('on');
+    pm();
+    onSnapshot(query(oc, orderBy('t','desc'), limit(30)), function(s){
+      orders = s.docs;
+      po();
+    }, function(e){ console.error(e); });
+    po();
+  }
 </script>
 </body>
 </html>
