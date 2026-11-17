@@ -71,4 +71,264 @@ h2 em{font-weight:500;color:var(--gold)}
 .item small{display:block;color:var(--muted);font-weight:400;font-size:.88rem}
 .item .d{flex:1;border-bottom:1px dotted var(--line);transform:translateY(-5px);min-width:16px}
 .item .r{display:flex;align-items:center;gap:14px}
-.item .p{font-family:"Playfair Display",Georgia,serif;font-size:1
+.item .p{font-family:"Playfair Display",Georgia,serif;font-size:1.2rem;font-weight:600;color:var(--gold)}
+.add{border:1px solid var(--gold);background:none;color:var(--gold);width:32px;height:32px;border-radius:50%;font-size:1.2rem;line-height:1;cursor:pointer;transition:.2s}
+.add:hover{background:var(--gold);color:var(--bg)}.add:active{transform:scale(.85)}
+.promo{background:var(--hero);color:var(--cream);text-align:center;padding:64px 22px;border:1px solid rgba(214,170,92,.35);outline:1px solid rgba(214,170,92,.2);outline-offset:-12px}
+.promo h2 em{color:#d6aa5c}
+.promo p{max-width:46ch;margin:0 auto 28px;color:rgba(243,231,211,.78)}
+.rev{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);padding:30px 26px}
+.rev .st{color:var(--gold);letter-spacing:4px;margin-bottom:12px}
+.rev p{font-family:"Playfair Display",Georgia,serif;font-style:italic;font-size:1.12rem;margin:0 0 16px;line-height:1.55}
+.rev small{color:var(--muted);letter-spacing:.1em;text-transform:uppercase;font-size:.75rem}
+.info{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(270px,1fr))}
+.card h3{font-size:1.4rem;margin-bottom:16px}
+table{width:100%;border-collapse:collapse}
+td{padding:10px 0;border-bottom:1px solid var(--line)}td:last-child{text-align:right;color:var(--gold);font-weight:600}
+.card .btn{margin-top:6px}
+footer{background:var(--hero);color:rgba(243,231,211,.6);text-align:center;padding:44px 20px 100px;font-size:.85rem;letter-spacing:.06em}
+footer b{display:block;font-family:"Playfair Display",Georgia,serif;font-size:1.4rem;color:#d6aa5c;margin-bottom:6px}
+.wa{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:25;background:#140d09;color:#d6aa5c;border:1px solid #d6aa5c;text-decoration:none;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;padding:13px 22px;border-radius:2px;box-shadow:0 10px 30px rgba(0,0,0,.4);transition:.25s}
+.wa:hover{background:#d6aa5c;color:#140d09}.wa.hide{display:none}
+.bar{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:26;max-width:560px;margin:0 auto;background:var(--hero);color:var(--cream);border:1px solid #d6aa5c;padding:10px 12px 10px 20px;display:none;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 10px 30px rgba(0,0,0,.5);font-weight:500}
+.bar.on{display:flex;animation:pop .3s}
+.bar .x{font:inherit;border:0;background:none;color:var(--cream);opacity:.7;padding:10px;cursor:pointer}
+.bar .go{background:#d6aa5c;color:#140d09;padding:11px 18px;text-decoration:none;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;font-weight:600}
+.gal{display:grid;gap:12px;grid-template-columns:repeat(4,1fr);grid-auto-rows:150px}
+.gal div{position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:16px;color:#f3e7d3;font:1.05rem "Playfair Display",Georgia,serif;transition:transform .5s}
+@media (hover:hover){.gal div:hover{transform:scale(1.03);z-index:2}}
+.gal div:before{content:"";position:absolute;inset:0;background:linear-gradient(transparent 35%,rgba(0,0,0,.65))}
+.gal span{position:relative}.gal svg{position:absolute;inset:0;width:100%;height:100%;padding:16px 16px 48px;box-sizing:border-box}
+.g1{grid-column:span 2;grid-row:span 2;background:radial-gradient(circle at 70% 30%,rgba(214,170,92,.4),transparent 50%),linear-gradient(135deg,#6b3418,#1c0f08)}
+.g2{background:radial-gradient(circle at 30% 30%,rgba(214,170,92,.35),transparent 55%),linear-gradient(160deg,#8a5a2b,#2b160b)}
+.g3{background:radial-gradient(circle at 70% 70%,rgba(255,255,255,.15),transparent 50%),linear-gradient(200deg,#3d2315,#140d09)}
+.g4{background:radial-gradient(circle at 50% 40%,rgba(243,231,211,.35),transparent 50%),linear-gradient(135deg,#7a3f1d,#2b160b)}
+.g5{background:radial-gradient(circle at 30% 70%,rgba(214,170,92,.35),transparent 55%),linear-gradient(120deg,#4a2a14,#1c0f08)}
+.tg{display:inline-block;font-style:normal;font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);border:1px solid var(--line);padding:1px 8px;margin-top:5px}
+details{border-bottom:1px solid var(--line);padding:20px 0}
+summary{cursor:pointer;font:1.15rem "Playfair Display",Georgia,serif;list-style:none;display:flex;justify-content:space-between;gap:16px}
+summary::-webkit-details-marker{display:none}summary::after{content:"+";color:var(--gold);font-size:1.5rem;line-height:1}details[open] summary::after{content:"–"}
+details p{margin:12px 0 0;color:var(--muted);max-width:60ch}
+.btn.out{background:none;color:var(--text);border:1px solid var(--gold)}.btn.out:hover{background:var(--gold);color:var(--bg)}
+.bts{display:flex;gap:10px;flex-wrap:wrap}
+.soc{display:flex;gap:26px;justify-content:center;margin:18px 0}.soc a{color:#d6aa5c;text-decoration:none;letter-spacing:.16em;text-transform:uppercase;font-size:.76rem}.soc a:hover{text-decoration:underline}
+@media (max-width:760px){.gal{grid-template-columns:repeat(2,1fr)}.g1{grid-column:span 2;grid-row:span 1}}
+.nl{display:flex;gap:26px;align-items:center}.nl a:not(.cta){color:var(--cream);text-decoration:none;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;opacity:.8}.nl a:not(.cta):hover{opacity:1;color:#d6aa5c}.tt{background:none;border:1px solid rgba(214,170,92,.45);color:#d6aa5c;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1rem}
+.fg{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}.fg label{display:block;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}.fg input,.fg select{width:100%;font:inherit;padding:13px 14px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:2px}.fg input:focus,.fg select:focus{outline:0;border-color:var(--gold)}
+#bt{cursor:pointer}#bt::after{content:" ▴";color:#d6aa5c}
+.sheet{position:fixed;left:12px;right:12px;bottom:calc(78px + env(safe-area-inset-bottom,0px));z-index:27;max-width:560px;margin:0 auto;background:var(--hero);color:var(--cream);border:1px solid #d6aa5c;padding:18px;display:none;max-height:55vh;overflow:auto;box-shadow:0 10px 30px rgba(0,0,0,.5)}.sheet.on{display:block;animation:pop .3s}.sheet h3{font-size:1.2rem;margin-bottom:8px;color:#d6aa5c}.sr{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(214,170,92,.2)}.sr>span:first-child{flex:1}.qt{display:flex;align-items:center;gap:10px}.qt button{width:28px;height:28px;border:1px solid #d6aa5c;background:none;color:#d6aa5c;border-radius:50%;cursor:pointer;font-size:1rem;line-height:1}.sr2{display:grid;gap:8px;margin-top:14px}.sr2 select,.sr2 input{font:inherit;padding:10px;background:#1f140d;color:var(--cream);border:1px solid rgba(214,170,92,.4)}
+@media (max-width:760px){.nl a:not(.cta){display:none}.nl{gap:12px}}
+.item.out{opacity:.45}.item.out .add{display:none}.item.out small::after{content:" · Agotado"}
+#pl{display:none}#pl.on{display:inline}#panel{display:none}#panel.on{display:block}
+.pn{display:grid}.po,.pm{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 0;border-bottom:1px solid var(--line)}.po>div,.pm>span{flex:1;min-width:150px}
+.pm input[type=number],.pf input,.pf select{font:inherit;padding:9px 10px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:2px}.pm input[type=number]{width:88px}
+.sm{font:inherit;font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--gold);background:none;color:var(--gold);padding:8px 14px;cursor:pointer}.sm:hover{background:var(--gold);color:var(--bg)}
+.pf{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}.pf input{flex:1;min-width:110px}
+.rv{opacity:0;transform:translateY(28px);transition:opacity .9s,transform .9s}.rv.in{opacity:1;transform:none}
+@media (max-width:760px){.hero .wrap{grid-template-columns:1fr;text-align:center;min-height:0}.eyebrow{justify-content:center}.eyebrow:before{display:none}.hero p{margin-inline:auto}.btns{justify-content:center}.cup{max-width:260px;order:-1}section{padding:60px 0}.tabs{gap:18px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<nav><div class="wrap"><b>Café <i>Aroma</i></b><div class="nl"><a href="#menu">Menú</a><a href="#reservas">Reservas</a><a href="#panel" id="pl">Panel</a><button class="tt" aria-label="Cambiar tema claro u oscuro">◐</button><a class="cta" href="#visitanos">Visítanos</a></div></div></nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Cafetería de especialidad <span id="op"></span></div>
+      <h1>Café de origen,<br><em>momentos con alma.</em></h1>
+      <p>Granos seleccionados, tostados cada mañana y preparados con paciencia. Una pausa que sabe a hogar.</p>
+      <div class="btns"><a class="btn" href="#menu">Ver el menú</a><a class="btn ghost" href="#visitanos">Cómo llegar</a></div>
+    </div>
+    <svg class="cup" viewBox="0 0 340 340" aria-hidden="true">
+      <defs><radialGradient id="cf" cx="45%" cy="40%"><stop offset="0" stop-color="#7a3f1d"/><stop offset="1" stop-color="#3a1b0b"/></radialGradient></defs>
+      <circle cx="170" cy="172" r="160" fill="#e9dcc4"/><circle cx="170" cy="172" r="146" fill="none" stroke="#c9a96a" stroke-width="1.5"/>
+      <rect x="236" y="150" width="96" height="44" rx="22" fill="#fbf6ec" stroke="#e4d6bc" stroke-width="2"/>
+      <circle cx="160" cy="172" r="112" fill="#fbf6ec" stroke="#e4d6bc" stroke-width="2"/>
+      <circle cx="160" cy="172" r="96" fill="url(#cf)"/><circle cx="160" cy="172" r="96" fill="none" stroke="#b9772f" stroke-width="3" opacity=".6"/>
+      <path d="M160 238C100 200 110 140 148 140C156 140 160 150 160 150C160 150 164 140 172 140C210 140 220 200 160 238Z" fill="#f6e6c8"/>
+      <path d="M160 222C118 196 124 156 148 156C154 156 160 164 160 164C160 164 166 156 172 156C196 156 202 196 160 222Z" fill="#8a4a22"/>
+      <path d="M160 204C134 188 138 168 150 168C155 168 160 174 160 174C160 174 165 168 170 168C182 168 186 188 160 204Z" fill="#f6e6c8"/>
+      <ellipse cx="44" cy="262" rx="9" ry="6" fill="#4a2410" transform="rotate(-30 44 262)"/><ellipse cx="62" cy="276" rx="9" ry="6" fill="#4a2410" transform="rotate(20 62 276)"/>
+    </svg>
+  </div>
+</header>
+
+<div class="stats"><div class="wrap"><div><b class="cnt" data-n="12">12</b><span>Años de tradición</span></div><div><b class="cnt" data-n="50000" data-p="+">+50,000</b><span>Tazas servidas</span></div><div><b class="cnt" data-n="4.9">4.9</b><span>Calificación</span></div></div></div>
+
+<section><div class="wrap rv">
+  <div class="ey">Selección de la casa</div>
+  <h2>Nuestros <em>clásicos</em></h2>
+  <p class="sub">Tres preparaciones que definen quiénes somos, elaboradas con ingredientes frescos cada día.</p>
+  <div class="fav">
+    <div class="fcard"><i>01</i><h3>Latte Aroma</h3><p>Espresso doble, leche texturizada y un toque de caramelo artesanal.</p><b>$3.75</b></div>
+    <div class="fcard"><i>02</i><h3>Croissant de mantequilla</h3><p>Hojaldre dorado, horneado cada mañana en nuestra cocina.</p><b>$2.75</b></div>
+    <div class="fcard"><i>03</i><h3>Frappé de moka</h3><p>Café frío, chocolate oscuro y crema batida ligera.</p><b>$4.50</b></div>
+  </div>
+</div></section>
+
+<section id="menu" style="padding-top:0"><div class="wrap rv">
+  <div class="ey">La carta</div>
+  <h2>Nuestro <em>menú</em></h2>
+  <p class="sub">Toca el signo + para armar tu pedido y envíalo por WhatsApp.</p>
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-t="a">Café</button>
+    <button role="tab" aria-selected="false" data-t="b">Cocina</button>
+    <button role="tab" aria-selected="false" data-t="c">Bebidas</button>
+  </div>
+  <div class="list on" id="a">
+    <div class="item"><span>Espresso<small>Intenso y corto</small></span><i class="d"></i><span class="p">$2.00</span></div>
+    <div class="item"><span>Americano<small>Suave y largo</small></span><i class="d"></i><span class="p">$2.50</span></div>
+    <div class="item"><span>Cappuccino<small>Espuma cremosa</small></span><i class="d"></i><span class="p">$3.50</span></div>
+    <div class="item"><span>Latte<small>Con leche al vapor</small></span><i class="d"></i><span class="p">$3.75</span></div>
+    <div class="item"><span>Frappé de moka<small>Frío, con chocolate</small></span><i class="d"></i><span class="p">$4.50</span></div>
+  </div>
+  <div class="list" id="b">
+    <div class="item"><span>Croissant<small>Mantequilla, recién horneado</small></span><i class="d"></i><span class="p">$2.75</span></div>
+    <div class="item"><span>Sándwich de jamón y queso<small>Pan artesanal</small></span><i class="d"></i><span class="p">$5.50</span></div>
+    <div class="item"><span>Tostada de aguacate<small>Con huevo pochado</small><em class="tg">Vegetariano</em></span><i class="d"></i><span class="p">$6.00</span></div>
+    <div class="item"><span>Brownie<small>Con nueces</small></span><i class="d"></i><span class="p">$3.00</span></div>
+    <div class="item"><span>Cheesecake<small>Porción del día</small></span><i class="d"></i><span class="p">$4.25</span></div>
+  </div>
+  <div class="list" id="c">
+    <div class="item"><span>Chocolate caliente<small>Espeso, a la taza</small></span><i class="d"></i><span class="p">$3.50</span></div>
+    <div class="item"><span>Té chai<small>Con especias</small><em class="tg">Vegano</em></span><i class="d"></i><span class="p">$3.25</span></div>
+    <div class="item"><span>Limonada de la casa<small>Con hierbabuena</small><em class="tg">Vegano</em></span><i class="d"></i><span class="p">$3.00</span></div>
+    <div class="item"><span>Jugo natural<small>De temporada</small></span><i class="d"></i><span class="p">$3.50</span></div>
+  </div>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap rv">
+  <div class="ey">Galería</div>
+  <h2>Un lugar para <em>quedarse</em></h2>
+  <p class="sub">Pequeños momentos de cada día en Café Aroma.</p>
+  <div class="gal">
+    <div class="g1"><svg viewBox="0 0 200 200" aria-hidden="true"><path d="M70 60q-8-12 0-22t0-18M100 60q-8-12 0-22t0-18M130 60q-8-12 0-22t0-18" fill="none" stroke="#f3e7d3" stroke-width="3" stroke-linecap="round" opacity=".6"/><path d="M52 82h96v34q0 38-48 38t-48-38z" fill="#f3e7d3"/><path d="M148 94h12q16 0 16 18t-16 18h-14" fill="none" stroke="#f3e7d3" stroke-width="8" stroke-linecap="round"/><ellipse cx="100" cy="168" rx="70" ry="9" fill="#d6aa5c"/><ellipse cx="100" cy="84" rx="48" ry="7" fill="#4a2410"/></svg><span>El espresso de cada mañana</span></div>
+    <div class="g2"><svg viewBox="0 0 200 200" aria-hidden="true"><g fill="#e6b062" stroke="#7a4a1f" stroke-width="3"><ellipse cx="46" cy="128" rx="15" ry="28" transform="rotate(-55 46 128)"/><ellipse cx="72" cy="104" rx="18" ry="32" transform="rotate(-28 72 104)"/><ellipse cx="128" cy="104" rx="18" ry="32" transform="rotate(28 128 104)"/><ellipse cx="154" cy="128" rx="15" ry="28" transform="rotate(55 154 128)"/><ellipse cx="100" cy="96" rx="22" ry="36"/></g></svg><span>Repostería casera</span></div>
+    <div class="g3"><svg viewBox="0 0 200 200" aria-hidden="true"><path d="M100 0v50" stroke="#d6aa5c" stroke-width="3"/><path d="M70 96h60l24 70H46z" fill="#ffd98a" opacity=".16"/><path d="M62 90a38 38 0 0 1 76 0z" fill="#d6aa5c"/><circle cx="100" cy="94" r="7" fill="#fff3c8"/><rect x="40" y="150" width="120" height="8" rx="3" fill="#f3e7d3"/><path d="M60 158v32M140 158v32" stroke="#f3e7d3" stroke-width="5"/></svg><span>Nuestro rincón</span></div>
+    <div class="g4"><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="78" fill="#f3e7d3"/><circle cx="100" cy="100" r="62" fill="#5a2c14"/><path d="M100 150C68 128 74 92 94 92C98 92 100 98 100 98C100 98 102 92 106 92C126 92 132 128 100 150Z" fill="#f6e6c8"/><path d="M100 136C80 122 84 104 94 104C98 104 100 108 100 108C100 108 102 104 106 104C116 104 120 122 100 136Z" fill="#7a3f1d"/></svg><span>Arte latte</span></div>
+    <div class="g5"><svg viewBox="0 0 200 200" aria-hidden="true"><g fill="#4a2410" stroke="#d6aa5c" stroke-width="2"><ellipse cx="70" cy="100" rx="26" ry="38" transform="rotate(-25 70 100)"/><ellipse cx="124" cy="86" rx="26" ry="38" transform="rotate(20 124 86)"/><ellipse cx="108" cy="140" rx="26" ry="38" transform="rotate(70 108 140)"/></g><g fill="none" stroke="#d6aa5c" stroke-width="3" stroke-linecap="round"><path d="M70 66q10 34 0 68" transform="rotate(-25 70 100)"/><path d="M124 52q10 34 0 68" transform="rotate(20 124 86)"/><path d="M108 106q10 34 0 68" transform="rotate(70 108 140)"/></g></svg><span>Granos de origen</span></div>
+  </div>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap rv"><div class="promo">
+  <div class="ey">Cada tarde · 3 a 5 p. m.</div>
+  <h2>2×1 en <em>cappuccinos</em></h2>
+  <p>Comparte una pausa con quien quieras: el segundo va por la casa.</p>
+  <a class="btn" href="#visitanos">Reclamar mi 2×1</a>
+</div></div></section>
+
+<section style="padding-top:0"><div class="wrap rv">
+  <div class="ey">Testimonios</div>
+  <h2>Lo que <em>dicen</em> de nosotros</h2>
+  <p class="sub">La mejor recomendación es la de quienes ya nos visitan.</p>
+  <div class="rev">
+    <div class="card"><div class="st">★★★★★</div><p>“El mejor latte que he probado. Entré por curiosidad y ahora vengo todos los días.”</p><small>Laura M.</small></div>
+    <div class="card"><div class="st">★★★★★</div><p>“Los croissants salen calientitos y el lugar es perfecto para trabajar con la laptop.”</p><small>Carlos R.</small></div>
+    <div class="card"><div class="st">★★★★★</div><p>“Atención de primera y el 2×1 de las tardes es un regalo. Súper recomendado.”</p><small>Andrea P.</small></div>
+  </div>
+</div></section>
+
+<section id="visitanos" style="padding-top:0"><div class="wrap rv">
+  <div class="ey">Encuéntranos</div>
+  <h2>Te esperamos en <em>casa</em></h2>
+  <p class="sub">Calle Principal 123, Centro</p>
+  <div class="info">
+    <div class="card"><h3>Horario</h3><table>
+      <tr><td>Lunes a viernes</td><td>7:00 – 20:00</td></tr>
+      <tr><td>Sábados</td><td>8:00 – 21:00</td></tr>
+      <tr><td>Domingos</td><td>9:00 – 15:00</td></tr></table></div>
+    <div class="card"><h3>Reservas y eventos</h3>
+      <p style="margin:0 0 16px;color:var(--muted)">Escríbenos para reservar mesa, pedidos grandes o celebraciones. Respondemos pronto.</p>
+      <a class="btn" href="mailto:hola@cafearoma.com">Escribir un correo</a></div>
+    <div class="card"><h3>Cómo llegar</h3>
+      <p style="margin:0 0 16px;color:var(--muted)">Calle Principal 123, Centro. Abre la ruta directo en tu app de mapas.</p>
+      <div class="bts"><a class="btn" href="https://www.google.com/maps/search/?api=1&query=Calle+Principal+123+Centro" target="_blank" rel="noopener">Google Maps</a><a class="btn out" href="https://waze.com/ul?q=Calle%20Principal%20123%20Centro" target="_blank" rel="noopener">Waze</a></div></div>
+  </div>
+</div></section>
+
+<section id="panel" style="padding-top:0"><div class="wrap">
+  <div class="ey">Modo dueño · demo</div>
+  <h2>Panel de <em>control</em></h2>
+  <p class="sub">Esto solo lo ve el dueño: pedidos en vivo y menú editable sin tocar código. Los cambios se guardan en una base de datos y se reflejan al instante en la página.</p>
+  <div class="card"><h3>Pedidos recibidos</h3><div id="po" class="pn"></div></div>
+  <div class="card" style="margin-top:20px"><h3>Editar menú</h3><div id="pm"></div>
+    <div class="pf"><select id="nc"><option value="a">Café</option><option value="b">Cocina</option><option value="c">Bebidas</option></select><input id="nn" placeholder="Nombre"><input id="nd" placeholder="Descripción"><input id="np" type="number" step="0.25" placeholder="Precio"><button class="sm" id="na">Agregar</button></div>
+    <div class="bts" style="margin-top:16px;align-items:center"><button class="sm" id="ns">Guardar menú inicial</button><span id="pmsg" style="color:var(--muted);font-size:.85rem"></span></div></div>
+</div></section>
+
+<section id="reservas" style="padding-top:0"><div class="wrap rv">
+  <div class="ey">Reservas</div>
+  <h2>Reserva tu <em>mesa</em></h2>
+  <p class="sub">Completa los datos y confirmamos por WhatsApp.</p>
+  <div class="card"><div class="fg">
+    <div><label for="rn">Nombre</label><input id="rn" autocomplete="name"></div>
+    <div><label for="rp">Personas</label><select id="rp"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></div>
+    <div><label for="rd">Fecha</label><input id="rd" type="date"></div>
+    <div><label for="rh">Hora</label><input id="rh" type="time" value="10:00"></div>
+  </div>
+  <div class="bts" style="margin-top:22px;align-items:center"><a class="btn" id="rg" href="#reservas">Reservar por WhatsApp</a><span id="rm" style="color:var(--muted);font-size:.9rem"></span></div></div>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap rv">
+  <div class="ey">Preguntas frecuentes</div>
+  <h2>Antes de <em>visitarnos</em></h2>
+  <p class="sub"></p>
+  <details><summary>¿Tienen WiFi y espacio para trabajar?</summary><p>Sí, WiFi gratuito y mesas con enchufes para que trabajes con calma.</p></details>
+  <details><summary>¿Tienen opciones veganas o sin gluten?</summary><p>Contamos con bebidas y snacks veganos. Pregúntanos por las opciones sin gluten del día.</p></details>
+  <details><summary>¿Se puede reservar mesa?</summary><p>Sí. Escríbenos por WhatsApp o correo con la fecha, la hora y el número de personas.</p></details>
+  <details><summary>¿Hacen pedidos para eventos o para llevar?</summary><p>Sí, preparamos pedidos grandes y para llevar. Avísanos con un día de anticipación.</p></details>
+  <details><summary>¿Qué formas de pago aceptan?</summary><p>Efectivo y tarjeta. Consulta en caja por otros métodos.</p></details>
+</div></section>
+
+<footer><b>Café Aroma</b><div class="soc"><a href="https://instagram.com/cafearoma" target="_blank" rel="noopener">Instagram</a><a href="https://facebook.com/cafearoma" target="_blank" rel="noopener">Facebook</a><a href="https://tiktok.com/@cafearoma" target="_blank" rel="noopener">TikTok</a></div>© 2026 · Hecho con cariño y mucho café</footer>
+<a class="wa" href="https://wa.me/0000000000" target="_blank" rel="noopener">Pedir por WhatsApp</a>
+
+<script>
+document.querySelectorAll('.tabs button').forEach(function(b){b.addEventListener('click',function(){
+document.querySelectorAll('.tabs button').forEach(function(x){x.setAttribute('aria-selected',x===b)});
+document.querySelectorAll('.list').forEach(function(l){l.classList.toggle('on',l.id===b.dataset.t)})})});
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.1});
+document.querySelectorAll('.rv').forEach(function(e){io.observe(e)});
+(function(){var d=new Date(),h=d.getHours()+d.getMinutes()/60,w=d.getDay(),s=w==0?[9,15]:w==6?[8,21]:[7,20],o=h>=s[0]&&h<s[1];document.getElementById('op').textContent=o?'● Abierto ahora':'○ Cerrado ahora'})();
+var co=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;co.unobserve(e.target);var el=e.target,n=+el.dataset.n,p=el.dataset.p||'',dec=n%1?1:0,t0=null;function f(t){t0=t0||t;var k=Math.min((t-t0)/1400,1),v=n*(1-Math.pow(1-k,3));el.textContent=p+v.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});if(k<1)requestAnimationFrame(f)}requestAnimationFrame(f)})},{threshold:.5});
+document.querySelectorAll('.cnt').forEach(function(e){co.observe(e)});
+var cart={},wa=document.querySelector('.wa'),bar=document.createElement('div');bar.className='bar';bar.innerHTML='<span id="bt"></span><span style="display:flex;align-items:center"><button class="x" aria-label="Vaciar pedido">✕</button><a class="go" target="_blank" rel="noopener">Enviar pedido</a></span>';document.body.appendChild(bar);
+function up(){var q=0,t=0,l=[];for(var k in cart){q+=cart[k].q;t+=cart[k].q*cart[k].p;l.push(cart[k].q+'× '+k)}bar.querySelector('#bt').textContent=q+' · $'+t.toFixed(2);bar.querySelector('.go').href='https://wa.me/0000000000?text='+encodeURIComponent('Hola Café Aroma, quiero pedir:\n'+l.join('\n')+'\nTotal: $'+t.toFixed(2));bar.classList.toggle('on',q>0);wa.classList.toggle('hide',q>0);if(!q)sh.classList.remove('on');rs()}
+bar.querySelector('.x').onclick=function(){cart={};up()};
+function bindItems(){document.querySelectorAll('.item').forEach(function(it){if(it.querySelector('.add'))return;var n=it.firstElementChild.childNodes[0].textContent.trim(),p=it.querySelector('.p'),pr=parseFloat(p.textContent.replace('$','')),r=document.createElement('div'),b=document.createElement('button');r.className='r';b.className='add';b.textContent='+';b.setAttribute('aria-label','Agregar '+n);p.replaceWith(r);r.appendChild(p);r.appendChild(b);b.onclick=function(){cart[n]=cart[n]||{q:0,p:pr};cart[n].q++;up()}});}bindItems();
+var ot='Para llevar',nt='',sh=document.createElement('div');sh.className='sheet';document.body.appendChild(sh);
+function rs(){var h='<h3>Tu pedido</h3>';for(var k in cart){var c=cart[k];h+='<div class="sr"><span>'+k+'</span><span class="qt"><button data-k="'+k+'" data-d="-1" aria-label="Quitar uno">−</button>'+c.q+'<button data-k="'+k+'" data-d="1" aria-label="Agregar uno">+</button></span><b>$'+(c.q*c.p).toFixed(2)+'</b></div>'}h+='<div class="sr2"><select id="ot"><option>Para llevar</option><option>Comer en el local</option></select><input id="nt" placeholder="Nota (ej. sin azúcar)"></div>';sh.innerHTML=h;sh.querySelector('#ot').value=ot;sh.querySelector('#nt').value=nt}
+sh.onclick=function(e){var b=e.target.closest('button[data-k]');if(!b)return;var c=cart[b.dataset.k];c.q+=+b.dataset.d;if(c.q<1)delete cart[b.dataset.k];up()};
+sh.oninput=function(e){if(e.target.id=='nt')nt=e.target.value};sh.onchange=function(e){if(e.target.id=='ot')ot=e.target.value};
+bar.querySelector('#bt').onclick=function(){sh.classList.toggle('on')};
+bar.querySelector('.go').addEventListener('click',function(){var l=[],t=0;for(var k in cart){l.push(cart[k].q+'× '+k);t+=cart[k].q*cart[k].p}this.href='https://wa.me/0000000000?text='+encodeURIComponent('Hola Café Aroma, quiero pedir ('+ot+'):\n'+l.join('\n')+(nt?'\nNota: '+nt:'')+'\nTotal: $'+t.toFixed(2))});
+var $=function(i){return document.getElementById(i)},rg=$('rg');$('rd').min=new Date().toISOString().slice(0,10);
+rg.onclick=function(e){var n=$('rn').value.trim(),d=$('rd').value;if(!n||!d){e.preventDefault();$('rm').textContent='Escribe tu nombre y elige una fecha.';return}$('rm').textContent='';rg.target='_blank';rg.href='https://wa.me/0000000000?text='+encodeURIComponent('Hola Café Aroma, quiero reservar mesa a nombre de '+n+' para '+$('rp').value+' persona(s) el '+d+' a las '+$('rh').value+'.')};
+var dk=matchMedia('(prefers-color-scheme: dark)').matches;document.querySelector('.tt').onclick=function(){dk=!dk;document.documentElement.setAttribute('data-theme',dk?'dark':'light')};
+(function(){
+var MENU=[],SEED,orders=[],own=false,col=null,oc=null,live=false;
+function E(x){return String(x).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function fail(e){console.error(e);$('pmsg').textContent='No se pudo guardar. Revisa tus permisos.'}
+document.querySelectorAll('.list').forEach(function(l){l.querySelectorAll('.item').forEach(function(it){var s=it.firstElementChild,tg=s.querySelector('.tg');MENU.push({id:'m'+MENU.length,cat:l.id,name:s.childNodes[0].textContent.trim(),desc:s.querySelector('small').textContent,price:parseFloat(it.querySelector('.p').textContent.replace('$','')),tag:tg?tg.textContent:'',out:false,o:MENU.length})})});
+SEED=MENU.slice();
+function pm(){if(!own)return;$('pm').innerHTML=MENU.slice().sort(function(x,y){return x.o-y.o}).map(function(m){return'<div class="pm"><span>'+E(m.name)+'</span><input type="number" step="0.25" value="'+m.price+'" data-i="'+m.id+'" data-a="p" aria-label="Precio"><label><input type="checkbox" data-i="'+m.id+'" data-a="o"'+(m.out?' checked':'')+'> Agotado</label><button class="sm" data-i="'+m.id+'" data-a="x">Borrar</button></div>'}).join('')}
+function draw(){['a','b','c'].forEach(function(c){$(c).innerHTML=MENU.filter(function(m){return m.cat==c}).sort(function(x,y){return x.o-y.o}).map(function(m){return'<div class="item'+(m.out?' out':'')+'"><span>'+E(m.name)+'<small>'+E(m.desc)+'</small>'+(m.tag?'<em class="tg">'+E(m.tag)+'</em>':'')+'</span><i class="d"></i><span class="p">$'+Number(m.price).toFixed(2)+'</span></div>'}).join('')});bindItems();pm()}
+function po(){$('po').innerHTML=orders.length?orders.map(function(d){var o=d.data();return'<div class="po"><div><b>'+E(o.type)+'</b> · $'+Number(o.total).toFixed(2)+'<br><small style="color:var(--muted)">'+E(o.items)+(o.note?' · Nota: '+E(o.note):'')+'</small></div><span>'+new Date(o.t).toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'})+(o.done?' ✓':'')+'</span><button class="sm" data-i="'+d.id+'" data-a="d">'+(o.done?'Reabrir':'Listo')+'</button><button class="sm" data-i="'+d.id+'" data-a="x">Borrar</button></div>'}).join(''):'<small style="color:var(--muted)">Aún no hay pedidos. Arma uno en el menú y envíalo: aparecerá aquí al instante.</small>'}
+function ens(){if(live)return Promise.resolve();return Promise.all(SEED.map(function(m){return col.doc(m.id).set(m)})).then(function(){live=true})}
+function act(t){var id=t.dataset.i,a=t.dataset.a,m=MENU.filter(function(x){return x.id==id})[0];if(!m)return;ens().then(function(){return a=='x'?col.doc(id).delete():col.doc(id).set(Object.assign({},m,a=='p'?{price:parseFloat(t.value)||m.price}:{out:t.checked}))}).catch(fail)}
+$('pm').onchange=function(e){if(e.target.dataset.a&&e.target.dataset.a!='x')act(e.target)};
+$('pm').onclick=function(e){if(e.target.dataset.a=='x')act(e.target)};
+$('na').onclick=function(){var n=$('nn').value.trim(),p=parseFloat($('np').value);if(!n||!(p>=0))return;ens().then(function(){return col.add({cat:$('nc').value,name:n,desc:$('nd').value.trim(),price:p,tag:'',out:false,o:Date.now()})}).then(function(){$('nn').value=$('nd').value=$('np').value='';$('pmsg').textContent=''}).catch(fail)};
+$('ns').onclick=function(){ens().then(function(){$('pmsg').textContent='Menú guardado en la base de datos.'}).catch(fail)};
+$('po').onclick=function(e){var t=e.target,id=t.dataset.i;if(!id||!oc)return;var d=orders.filter(function(x){return x.id==id})[0];(t.dataset.a=='x'?oc.doc(id).delete():oc.doc(id).update({done:!d.data().done})).catch(fail)};
+document.querySelector('.bar .go').addEventListener('click',function(){if(!oc)return;var l=[],t=0;for(var k in cart){l.push(cart[k].q+'× '+k);t+=cart[k].q*cart[k].p}if(!l.length)return;oc.add({t:Date.now(),type:ot,note:nt,items:l.join(', '),total:t,done:false}).catch(function(){})});
+if(window.claude&&claude.use){claude.use('db').then(function(db){if(!db)return;col=db.collection('menu');oc=db.collection('orders');
+col.onSnapshot(function(s){live=s.docs.length>0;MENU=live?s.docs.map(function(d){return Object.assign({},d.data(),{id:d.id})}):SEED.slice();draw()},function(){});
+return claude.use('user').then(function(u){own=!!(u&&u.canEdit());if(!own)return;$('panel').classList.add('on');$('pl').classList.add('on');pm();oc.orderBy('t','desc').limit(30).onSnapshot(function(s){orders=s.docs;po()},function(){});po()})}).catch(function(e){console.error(e)})}
+})();
+
+</script>
+</body>
+</html>
