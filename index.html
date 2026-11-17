@@ -399,7 +399,6 @@ function msg() {
     '\n\n💵 Pago: ' + pago + '\n📝 Nota: ' + (nota || 'Ninguna') + '\n*Total: $' + s.t.toFixed(2) + '*' +
     (deliv() ? '\n\n📍 Te envío mi ubicación en el siguiente mensaje.' : '');
 }
-/* refresh() NO redibuja el panel: así el teclado no se cierra al escribir */
 function refresh() {
   const s = sum(); $('bt').textContent = s.q + ' · $' + s.t.toFixed(2);
   if (!sent) go.href = 'https://wa.me/' + WSP + '?text=' + encodeURIComponent(msg());
@@ -489,7 +488,7 @@ go.addEventListener('click', e => {
 let MENU = [], SEED = [], orders = [], live = false; const SV = {};
 const col = collection(db, 'menu'), oc = collection(db, 'orders');
 const fail = e => { console.error(e); $('pmsg').textContent = 'No se pudo guardar. Revisa tus permisos.'; };
-$('nd').insertAdjacentHTML('afterend', '<input id="nv" placeholder="Variantes (opcional) Tamaño: Chico,Grande (+$1.00)|Leche: Entera,Avena">');
+$('nd').insertAdjacentHTML('afterend', '<input id="nv" placeholder="Variantes (ej. Sabor: Café,Oreo)">');
 
 document.querySelectorAll('.list').forEach(l => l.querySelectorAll('.item').forEach(it => {
   const r = it.querySelector('.item-row'), s = r.firstElementChild, tg = s.querySelector('.tg'), name = s.childNodes[0].textContent.trim(), v = it.dataset.variants || '';
@@ -542,14 +541,13 @@ $('po').onclick = e => {
   (t.dataset.a == 'x' ? deleteDoc(doc(db, 'orders', id)) : updateDoc(doc(db, 'orders', id), { done: !d.data().done })).catch(fail);
 };
 
-/* Las variantes de los productos ya guardados se recuperan del menú base */
 onSnapshot(col, s => {
   live = s.docs.length > 0;
   MENU = live ? s.docs.map(d => { const x = { ...d.data(), id: d.id }; if (x.variants === undefined) x.variants = SV[x.name] || ''; return x; }) : SEED.slice();
   draw();
 }, e => console.error(e));
 
-/* ---------- Panel del dueño (se abre con ?admin=miapp123 al final del link) ---------- */
+/* ---------- Panel del dueño ---------- */
 if (new URLSearchParams(location.search).get('admin') === 'miapp123') {
   $('panel').classList.add('on'); $('pl').classList.add('on'); pm();
   onSnapshot(query(oc, orderBy('t', 'desc'), limit(30)), s => { orders = s.docs; po(); }, e => console.error(e));
