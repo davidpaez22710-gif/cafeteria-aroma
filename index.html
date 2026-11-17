@@ -56,10 +56,23 @@ h2 em{font-weight:500;color:var(--gold)}
 .fav{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .fcard{background:var(--hero);color:var(--cream);padding:34px 28px;border:1px solid rgba(214,170,92,.25);transition:.35s;position:relative;overflow:hidden}
 @media (hover:hover){.fcard:hover{transform:translateY(-8px);border-color:#d6aa5c}}
-.fcard i{font:normal 800 4.2rem/1 "Playfair Display",Georgia,serif;color:rgba(214,170,92,.22)}
+.fcard>i{position:absolute;top:10px;right:20px;z-index:2;font:normal 800 3.2rem/1 "Playfair Display",Georgia,serif;color:rgba(214,170,92,.35)}
 .fcard h3{font-size:1.5rem;margin:14px 0 8px}
 .fcard p{margin:0 0 18px;color:rgba(243,231,211,.72);font-size:.95rem}
 .fcard b{color:#d6aa5c;font-family:"Playfair Display",Georgia,serif;font-size:1.3rem}
+.sc{margin:-34px -28px 18px;height:170px;background:radial-gradient(circle at 50% 70%,rgba(214,170,92,.28),transparent 62%),linear-gradient(160deg,#2b160b,#140d09);display:flex;align-items:center;justify-content:center;border-bottom:1px solid rgba(214,170,92,.2)}
+.sc svg{height:100%;width:auto;overflow:visible}
+.stm{fill:none;stroke:#f3e7d3;stroke-width:4;stroke-linecap:round;opacity:0;animation:rise 3.2s ease-in-out infinite}
+.stm.b{animation-delay:1.1s}.stm.c{animation-delay:2.1s}
+@keyframes rise{0%{opacity:0;transform:translateY(14px)}35%{opacity:.7}100%{opacity:0;transform:translateY(-22px)}}
+.bub{fill:#f3e7d3;opacity:0;animation:bubble 3s ease-in infinite}
+.bub.b{animation-delay:.9s}.bub.c{animation-delay:1.8s}
+@keyframes bubble{0%{opacity:0;transform:translateY(0)}25%{opacity:.8}100%{opacity:0;transform:translateY(-52px)}}
+.spk{fill:#ffe9a8;opacity:0;transform-box:fill-box;transform-origin:center;animation:twk 2.4s ease-in-out infinite}
+.spk.b{animation-delay:.8s}.spk.c{animation-delay:1.6s}
+@keyframes twk{0%,100%{opacity:0;transform:scale(.3)}50%{opacity:1;transform:scale(1.2)}}
+.pour{fill:#7a3f1d;transform-box:fill-box;transform-origin:top;animation:pr 2.8s ease-in-out infinite}
+@keyframes pr{0%{transform:scaleY(0)}25%,70%{transform:scaleY(1)}100%{transform:scaleY(0);opacity:0}}
 .tabs{display:flex;gap:28px;margin-bottom:26px;border-bottom:1px solid var(--line)}
 .tabs button{font:inherit;font-size:.82rem;letter-spacing:.16em;text-transform:uppercase;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);padding:0 0 14px;margin-bottom:-1px;cursor:pointer;transition:.2s}
 .tabs button[aria-selected="true"]{color:var(--text);border-color:var(--gold)}
@@ -79,6 +92,8 @@ h2 em{font-weight:500;color:var(--gold)}
 .promo{background:var(--hero);color:var(--cream);text-align:center;padding:64px 22px;border:1px solid rgba(214,170,92,.35);outline:1px solid rgba(214,170,92,.2);outline-offset:-12px}
 .promo h2 em{color:#d6aa5c}
 .promo p{max-width:46ch;margin:0 auto 28px;color:rgba(243,231,211,.78)}
+#p2m{display:block;margin-top:16px;color:rgba(243,231,211,.78);font-size:.92rem}
+#p2m b{display:inline-block;margin-top:4px;border:1px dashed #d6aa5c;color:#d6aa5c;padding:4px 14px;letter-spacing:.14em;font-size:1rem}
 .rev{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .card{background:var(--surface);border:1px solid var(--line);padding:30px 26px}
 .rev .st{color:var(--gold);letter-spacing:4px;margin-bottom:12px}
@@ -138,7 +153,7 @@ details p{margin:12px 0 0;color:var(--muted);max-width:60ch}
 .pf{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}.pf input{flex:1;min-width:110px}
 .rv{opacity:0;transform:translateY(28px);transition:opacity .9s,transform .9s}.rv.in{opacity:1;transform:none}
 @media (max-width:760px){.hero .wrap{grid-template-columns:1fr;text-align:center;min-height:0}.eyebrow{justify-content:center}.eyebrow:before{display:none}.hero p{margin-inline:auto}.btns{justify-content:center}.cup{max-width:260px;order:-1}section{padding:60px 0}.tabs{gap:18px}}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}.stm,.bub,.spk{opacity:.6}}
 </style>
 </head>
 <body>
@@ -173,9 +188,37 @@ details p{margin:12px 0 0;color:var(--muted);max-width:60ch}
   <h2>Nuestros <em>clásicos</em></h2>
   <p class="sub">Tres preparaciones que definen quiénes somos, elaboradas con ingredientes frescos cada día.</p>
   <div class="fav">
-    <div class="fcard"><i>01</i><h3>Latte Aroma</h3><p>Espresso doble, leche texturizada y un toque de caramelo artesanal.</p><b>$3.75</b></div>
-    <div class="fcard"><i>02</i><h3>Croissant de mantequilla</h3><p>Hojaldre dorado, horneado cada mañana en nuestra cocina.</p><b>$2.75</b></div>
-    <div class="fcard"><i>03</i><h3>Frappé de moka</h3><p>Café frío, chocolate oscuro y crema batida ligera.</p><b>$4.50</b></div>
+    <div class="fcard">
+      <div class="sc"><svg viewBox="0 0 200 170" aria-hidden="true">
+        <path class="stm" d="M78 70q-10-14 0-26t0-20"/><path class="stm b" d="M100 70q-10-14 0-26t0-20"/><path class="stm c" d="M122 70q-10-14 0-26t0-20"/>
+        <path d="M54 84h92v30q0 36-46 36t-46-36z" fill="#f3e7d3"/>
+        <path d="M146 96h10q16 0 16 16t-16 16h-12" fill="none" stroke="#f3e7d3" stroke-width="8" stroke-linecap="round"/>
+        <ellipse cx="100" cy="86" rx="46" ry="7" fill="#7a3f1d"/>
+        <path d="M100 90c-14-6-10-14-3-14 3 0 3 3 3 3s0-3 3-3c7 0 11 8-3 14z" fill="#f6e6c8"/>
+        <ellipse cx="100" cy="160" rx="70" ry="8" fill="#d6aa5c" opacity=".85"/>
+      </svg></div>
+      <i>01</i><h3>Latte Aroma</h3><p>Espresso doble, leche texturizada y un toque de caramelo artesanal.</p><b>$3.75</b></div>
+    <div class="fcard">
+      <div class="sc"><svg viewBox="0 0 200 170" aria-hidden="true">
+        <path class="stm" d="M80 66q-10-12 0-22t0-16"/><path class="stm b" d="M104 62q-10-12 0-22t0-16"/><path class="stm c" d="M128 66q-10-12 0-22t0-16"/>
+        <g fill="#e6b062" stroke="#7a4a1f" stroke-width="3"><ellipse cx="46" cy="128" rx="14" ry="26" transform="rotate(-58 46 128)"/><ellipse cx="70" cy="106" rx="17" ry="30" transform="rotate(-30 70 106)"/><ellipse cx="130" cy="106" rx="17" ry="30" transform="rotate(30 130 106)"/><ellipse cx="154" cy="128" rx="14" ry="26" transform="rotate(58 154 128)"/><ellipse cx="100" cy="98" rx="21" ry="34"/></g>
+        <g fill="none" stroke="#7a4a1f" stroke-width="2" stroke-linecap="round" opacity=".7"><path d="M92 80q8 6 0 14M108 80q-8 6 0 14M62 94q8 4 4 14M138 94q-8 4-4 14"/></g>
+        <path class="spk" d="M60 70l3 8 8 3-8 3-3 8-3-8-8-3 8-3z"/><path class="spk b" d="M146 78l3 8 8 3-8 3-3 8-3-8-8-3 8-3z"/><path class="spk c" d="M100 52l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/>
+        <ellipse cx="100" cy="160" rx="70" ry="8" fill="#d6aa5c" opacity=".85"/>
+      </svg></div>
+      <i>02</i><h3>Croissant de mantequilla</h3><p>Hojaldre dorado, horneado cada mañana en nuestra cocina.</p><b>$2.75</b></div>
+    <div class="fcard">
+      <div class="sc"><svg viewBox="0 0 200 170" aria-hidden="true">
+        <path d="M122 18l-14 62" stroke="#d6aa5c" stroke-width="7" stroke-linecap="round"/>
+        <path d="M60 70h80l-10 84q-1 8-10 8H80q-9 0-10-8z" fill="#f3e7d3" fill-opacity=".14" stroke="#f3e7d3" stroke-width="3"/>
+        <path d="M66 100h68l-6 52q-1 6-8 6H80q-7 0-8-6z" fill="#7a3f1d"/>
+        <path class="pour" x="0" d="M96 70h8v60h-8z" opacity=".9"/>
+        <circle class="bub" cx="88" cy="140" r="4"/><circle class="bub b" cx="108" cy="146" r="3"/><circle class="bub c" cx="120" cy="138" r="4"/>
+        <path d="M58 70q0-22 22-22 6-10 20-10t20 10q22 0 22 22z" fill="#fbf6ec"/>
+        <path d="M84 56q16 8 32 0" fill="none" stroke="#7a3f1d" stroke-width="3" stroke-linecap="round"/>
+        <ellipse cx="100" cy="164" rx="52" ry="5" fill="#d6aa5c" opacity=".85"/>
+      </svg></div>
+      <i>03</i><h3>Frappé de moka</h3><p>Café frío, chocolate oscuro y crema batida ligera.</p><b>$4.50</b></div>
   </div>
 </div></section>
 
@@ -255,7 +298,8 @@ details p{margin:12px 0 0;color:var(--muted);max-width:60ch}
   <div class="ey">Cada tarde · 3 a 5 p. m.</div>
   <h2>2×1 en <em>cappuccinos</em></h2>
   <p>Comparte una pausa con quien quieras: el segundo va por la casa.</p>
-  <a class="btn" href="#visitanos">Reclamar mi 2×1</a>
+  <a class="btn" id="p2" href="#visitanos">Reclamar mi 2×1</a>
+  <small id="p2m" aria-live="polite"></small>
 </div></div></section>
 
 <section style="padding-top:0"><div class="wrap rv">
@@ -380,6 +424,24 @@ rg.onclick = e => {
   if (!n || !d) { e.preventDefault(); $('rm').textContent = 'Escribe tu nombre y elige una fecha.'; return; }
   $('rm').textContent = ''; rg.target = '_blank';
   rg.href = 'https://wa.me/' + WSP + '?text=' + encodeURIComponent('Hola Café Aroma, quiero reservar mesa a nombre de ' + n + ' para ' + $('rp').value + ' persona(s) el ' + d + ' a las ' + $('rh').value + '.');
+};
+
+/* ===== Promo 2×1 con cupón único ===== */
+const p2 = $('p2'), p2m = $('p2m');
+const mkCode = () => { const a = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c = ''; for (let i = 0; i < 5; i++) c += a[Math.floor(Math.random() * a.length)]; return 'AROMA-' + c; };
+p2.onclick = e => {
+  const h = new Date().getHours();
+  if (h < 15 || h >= 17) {
+    e.preventDefault();
+    p2m.textContent = 'La promo es de 3 a 5 p. m. ¡Te esperamos a esa hora!';
+    return;
+  }
+  const code = mkCode();
+  p2m.innerHTML = 'Tu cupón (muéstralo en caja):<br><b>' + code + '</b>';
+  p2.target = '_blank'; p2.rel = 'noopener';
+  p2.href = 'https://wa.me/' + WSP + '?text=' + encodeURIComponent('Hola Café Aroma, quiero reclamar el 2×1 en cappuccinos 🎉\nMi cupón: ' + code);
+  addDoc(collection(db, 'orders'), { t: Date.now(), tipo: 'Promo 2×1', detalle: 'Cupón ' + code, pago: '-', note: '', items: '2×1 Cappuccino', total: 0, done: false })
+    .catch(err => console.error('Error guardando cupón:', err));
 };
 
 let cart = {}, sent = false, tipo = 'Para llevar', modo = 'Recoger en el local', mesa = '', pago = 'Efectivo', nota = '';
