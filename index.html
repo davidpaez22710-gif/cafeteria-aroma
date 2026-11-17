@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Café Aroma · Cafetería de especialidad</title>
+<meta name="description" content="Café Aroma: cafetería de especialidad con café de origen, repostería casera y pedidos por WhatsApp. Calle Principal 123, Centro.">
+<meta property="og:title" content="Café Aroma · Cafetería de especialidad">
+<meta property="og:description" content="Café de origen, momentos con alma. Mira el menú y haz tu pedido por WhatsApp.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#140d09">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"CafeOrCoffeeShop","name":"Café Aroma","description":"Cafetería de especialidad con café de origen y repostería casera.","address":{"@type":"PostalAddress","streetAddress":"Calle Principal 123","addressLocality":"Centro"},"telephone":"+00000000000","priceRange":"$$","servesCuisine":"Café, repostería","openingHours":["Mo-Fr 07:00-20:00","Sa 08:00-21:00","Su 09:00-15:00"]}</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,500&family=Inter:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#f7f1e7;--surface:#fffaf2;--text:#1f1510;--muted:#7b6757;--gold:#a8782d;--line:#e3d6c2;--hero:#140d09;--cream:#f3e7d3;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#110b07;--surface:#1b120c;--text:#f1e7d6;--muted:#b9a58d;--gold:#d6aa5c;--line:#33261b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#110b07;--surface:#1b120c;--text:#f1e7d6;--muted:#b9a58d;--gold:#d6aa5c;--line:#33261b;color-scheme:dark}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px);scroll-behavior:smooth}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.7 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--hero);z-index:30}
+h1,h2,h3{font-family:"Playfair Display",Georgia,serif;margin:0;line-height:1.1}
+a{color:inherit}
+.wrap{max-width:1040px;margin:0 auto;padding:0 22px}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--hero);color:var(--cream);border-bottom:1px solid rgba(214,170,92,.25)}
+nav .wrap{display:flex;justify-content:space-between;align-items:center;height:64px}
+nav b{font-family:"Playfair Display",Georgia,serif;font-size:1.3rem;letter-spacing:.04em}
+nav b i{color:#d6aa5c;font-style:normal}
+nav a.cta{border:1px solid #d6aa5c;color:#d6aa5c;padding:8px 20px;border-radius:2px;text-decoration:none;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;transition:.25s}
+nav a.cta:hover{background:#d6aa5c;color:#140d09}
+.hero{background:radial-gradient(ellipse at 78% 40%,#3d2315 0,transparent 60%),var(--hero);color:var(--cream)}
+.hero .wrap{display:grid;grid-template-columns:1.15fr 1fr;gap:24px;align-items:center;min-height:min(86vh,720px);padding-top:48px;padding-bottom:48px}
+.eyebrow{display:flex;gap:14px;align-items:center;flex-wrap:wrap;color:#d6aa5c;font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;margin-bottom:22px}
+.eyebrow:before{content:"";width:42px;height:1px;background:#d6aa5c}
+#op{border:1px solid rgba(214,170,92,.4);padding:3px 12px;border-radius:99px;letter-spacing:.06em;text-transform:none;font-size:.78rem}
+.hero h1{font-size:clamp(2.6rem,8vw,5.2rem);font-weight:800}
+.hero h1 em{color:#d6aa5c;font-weight:500}
+.hero p{font-size:1.08rem;color:rgba(243,231,211,.78);max-width:42ch;margin:22px 0 32px}
+.btns{display:flex;gap:14px;flex-wrap:wrap}
+.btn{display:inline-block;background:#d6aa5c;color:#140d09;padding:15px 32px;border-radius:2px;text-decoration:none;font-weight:600;font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;transition:.25s}
+.btn:hover{background:#ecc277;transform:translateY(-2px)}
+.btn.ghost{background:none;color:var(--cream);border:1px solid rgba(243,231,211,.4)}
+.btn.ghost:hover{background:rgba(243,231,211,.1)}
+.cup{width:100%;max-width:400px;margin:0 auto;filter:drop-shadow(0 30px 40px rgba(0,0,0,.55));animation:float 7s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-10px) rotate(2deg)}}
+.stats{background:var(--surface);border-bottom:1px solid var(--line)}
+.stats .wrap{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;padding-top:28px;padding-bottom:28px}
+.stats div+div{border-left:1px solid var(--line)}
+.stats b{display:block;font-family:"Playfair Display",Georgia,serif;font-size:clamp(1.8rem,6vw,2.8rem);color:var(--gold)}
+.stats span{color:var(--muted);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase}
+section{padding:84px 0}
+.ey{color:var(--gold);font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;margin-bottom:12px}
+h2{font-size:clamp(2rem,5.5vw,3rem);font-weight:800;margin-bottom:12px}
+h2 em{font-weight:500;color:var(--gold)}
+.sub{color:var(--muted);max-width:52ch;margin:0 0 40px}
+.fav{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.fcard{background:var(--hero);color:var(--cream);padding:34px 28px;border:1px solid rgba(214,170,92,.25);transition:.35s;position:relative;overflow:hidden}
+@media (hover:hover){.fcard:hover{transform:translateY(-8px);border-color:#d6aa5c}}
+.fcard i{font:normal 800 4.2rem/1 "Playfair Display",Georgia,serif;color:rgba(214,170,92,.22)}
+.fcard h3{font-size:1.5rem;margin:14px 0 8px}
+.fcard p{margin:0 0 18px;color:rgba(243,231,211,.72);font-size:.95rem}
+.fcard b{color:#d6aa5c;font-family:"Playfair Display",Georgia,serif;font-size:1.3rem}
+.tabs{display:flex;gap:28px;margin-bottom:26px;border-bottom:1px solid var(--line)}
+.tabs button{font:inherit;font-size:.82rem;letter-spacing:.16em;text-transform:uppercase;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);padding:0 0 14px;margin-bottom:-1px;cursor:pointer;transition:.2s}
+.tabs button[aria-selected="true"]{color:var(--text);border-color:var(--gold)}
+.list{display:none}.list.on{display:block;animation:pop .4s}
+@keyframes pop{from{opacity:0;transform:translateY(10px)}}
+.item{display:flex;align-items:baseline;gap:12px;padding:15px 0}
+.item>span:first-child{font-weight:500}
+.item small{display:block;color:var(--muted);font-weight:400;font-size:.88rem}
+.item .d{flex:1;border-bottom:1px dotted var(--line);transform:translateY(-5px);min-width:16px}
+.item .r{display:flex;align-items:center;gap:14px}
+.item .p{font-family:"Playfair Display",Georgia,serif;font-size:1
