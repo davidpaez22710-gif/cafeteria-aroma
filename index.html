@@ -863,13 +863,16 @@ async function cleanCoupons() {
   if (!ADMIN || cleaning || !pLive) return;
   cleaning = true;
   try {
-    const s = await getDocs(cc);
+    const s = await getDocs(cc), now = Date.now();
     const dead = s.docs.filter(d => {
       const c = d.data(), p = PROMOS.find(x => x.id == c.promoId);
-      if (!p) return true;
-      return !!p.expires && Date.now() > endOf(p);
+      if (!p) return true;                                              // su promo ya no existe
+      if (p.expires && now > endOf(p)) return true;                     // su promo venció
+      return !!c.exp && now > new Date(c.exp + 'T23:59:59').getTime();  // el cupón venció (ya no se puede canjear)
     });
-    await Promise.all(dead.map(d => deleteDoc(d.ref)));
+    const r = await Promise.allSettled(dead.map(d => deleteDoc(d.ref)));
+    const bad = r.filter(x => x.status == 'rejected');
+    if (bad.length) { console.error('Error limpiando cupones:', bad[0].reason); const m = $('cmsg'); if (m) m.textContent = 'No se pudieron borrar ' + bad.length + ' cupón(es): ' + (bad[0].reason && bad[0].reason.code || 'error') + '. Revisa las reglas de Firestore.'; }
   } catch (e) { console.error('Error limpiando cupones:', e); }
   cleaning = false;
 }
