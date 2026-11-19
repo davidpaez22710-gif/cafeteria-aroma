@@ -448,14 +448,22 @@ const DEFAULT_HOURS = {
 };
 let HOURS = JSON.parse(JSON.stringify(DEFAULT_HOURS));
 const toMins = s => { const [h, m] = (s || '00:00').split(':').map(Number); return (h || 0) * 60 + (m || 0); };
+/* Hora oficial del café (Ecuador continental, UTC-5): no depende de la zona horaria del celular del cliente */
+const TZ = 'America/Guayaquil', RES_MARGIN = 30; // minutos antes del cierre en que se dejan de aceptar reservas
+const WD = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+function nowEC() {
+  const o = {};
+  new Intl.DateTimeFormat('en-US', { timeZone: TZ, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', weekday: 'short' })
+    .formatToParts(new Date()).forEach(x => { o[x.type] = x.value; });
+  return { date: o.year + '-' + o.month + '-' + o.day, w: WD[o.weekday], mins: (+o.hour) * 60 + (+o.minute) };
+}
 function isOpenNow() {
-  const d = new Date(), w = d.getDay(), cfg = HOURS[w];
+  const n = nowEC(), cfg = HOURS[n.w];
   if (!cfg || !cfg.open) return false;
-  const now = d.getHours() * 60 + d.getMinutes();
-  return now >= toMins(cfg.start) && now < toMins(cfg.end);
+  return n.mins >= toMins(cfg.start) && n.mins < toMins(cfg.end);
 }
 function todayScheduleText() {
-  const cfg = HOURS[new Date().getDay()];
+  const cfg = HOURS[nowEC().w];
   return (!cfg || !cfg.open) ? 'Hoy estamos cerrados.' : 'Horario de hoy: ' + cfg.start + ' – ' + cfg.end + '.';
 }
 const co = new IntersectionObserver(es => es.forEach(e => {
@@ -469,10 +477,16 @@ document.querySelectorAll('.cnt').forEach(e => co.observe(e));
 let dk = matchMedia('(prefers-color-scheme: dark)').matches;
 document.querySelector('.tt').onclick = () => { dk = !dk; document.documentElement.setAttribute('data-theme', dk ? 'dark' : 'light'); };
 
-const rg = $('rg'); $('rd').min = new Date().toISOString().slice(0, 10);
+const rg = $('rg'), ld = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+$('rd').min = nowEC().date;
 rg.onclick = e => {
   const n = $('rn').value.trim(), d = $('rd').value;
   if (!n || !d) { e.preventDefault(); $('rm').textContent = 'Escribe tu nombre y elige una fecha.'; return; }
+  const h = $('rh').value, cfg = HOURS[new Date(d + 'T00:00:00').getDay()], hm = toMins(h), nw = nowEC();
+  if (!h) { e.preventDefault(); $('rm').textContent = 'Elige la hora de tu reserva.'; return; }
+  if (!cfg || !cfg.open) { e.preventDefault(); $('rm').textContent = 'Ese día estamos cerrados. Elige otra fecha.'; return; }
+  if (hm < toMins(cfg.start) || hm > toMins(cfg.end) - RES_MARGIN) { e.preventDefault(); $('rm').textContent = 'Ese día atendemos de ' + cfg.start + ' a ' + cfg.end + '. Recibimos reservas hasta ' + RES_MARGIN + ' min antes del cierre.'; return; }
+  if (d == nw.date && hm <= nw.mins) { e.preventDefault(); $('rm').textContent = 'Esa hora ya pasó. Elige una hora posterior.'; return; }
   $('rm').textContent = ''; rg.target = '_blank';
   rg.href = 'https://wa.me/' + WSP + '?text=' + encodeURIComponent('Hola Café Aroma, quiero reservar mesa a nombre de ' + n + ' para ' + $('rp').value + ' persona(s) el ' + d + ' a las ' + $('rh').value + '.');
 };
@@ -523,6 +537,7 @@ function syncActionBtn() {
 function syncOpenUI() {
   const open = isOpenNow();
   $('op').textContent = open ? '● Abierto ahora' : '○ Cerrado ahora';
+  $('rd').min = nowEC().date;
   wa.classList.toggle('closed-btn', !open);
   wa.textContent = open ? 'Pedir por WhatsApp' : 'Cerrado ahora';
   syncActionBtn();
@@ -554,7 +569,7 @@ function refresh() {
   syncOpenUI();
 }
 function up() { refresh(); if (!sum().q) sh.classList.remove('on'); rs(); syncActionBtn(); }
-function reset() { cart = {}; sent = false; sh.classList.remove('on'); go.classList.remove('sent'); up(); }
+function reset() { cart = {}; nota = ''; mesa = ''; tipo = 'Para llevar'; modo = 'Recoger en el local'; pago = 'Efectivo'; sent = false; sh.classList.remove('on'); go.classList.remove('sent'); up(); }
 
 function rs() {
   let h = '<h3>Tu pedido</h3>';
@@ -736,8 +751,49 @@ function draw() {
   });
   bindItems(); pm();
 }
-let lastP = -1;
-function beepNew(n) { if (lastP >= 0 && n > lastP) { try { const a = new (window.AudioContext || window.webkitAudioContext)(), o = a.createOscillator(); o.connect(a.destination); o.frequency.value = 880; o.start(); setTimeout(() => { o.stop(); a.close(); }, 250); } catch (e) {} if (navigator.vibrate) navigator.vibrate(200); } lastP = n; }
+
+/* ===== Aviso sonoro y vibración de pedidos nuevos (panel del dueño) ===== */
+let audioCtx = null, seen = null;
+function getCtx() {
+  if (!audioCtx) { const AC = window.AudioContext || window.webkitAudioContext; if (AC) audioCtx = new AC(); }
+  return audioCtx;
+}
+function unlockAudio() {
+  try {
+    const c = getCtx(); if (!c) return;
+    if (c.state === 'suspended') c.resume();
+  } catch (e) {}
+}
+/* Los navegadores solo permiten audio/vibración tras un toque del usuario: desbloqueamos con el primero */
+['click', 'touchstart', 'keydown'].forEach(ev => document.addEventListener(ev, unlockAudio, { passive: true }));
+document.addEventListener('visibilitychange', () => { if (!document.hidden) unlockAudio(); });
+
+function beep() {
+  try {
+    const c = getCtx();
+    if (c) {
+      if (c.state === 'suspended') c.resume();
+      const t = c.currentTime;
+      [0, 0.35].forEach(off => {
+        const o = c.createOscillator(), g = c.createGain();
+        o.type = 'sine'; o.frequency.value = 880;
+        o.connect(g); g.connect(c.destination);
+        g.gain.setValueAtTime(0.0001, t + off);
+        g.gain.exponentialRampToValueAtTime(0.4, t + off + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + off + 0.3);
+        o.start(t + off); o.stop(t + off + 0.32);
+      });
+    }
+  } catch (e) { console.error('Error de sonido:', e); }
+  try { if (navigator.vibrate) navigator.vibrate([200, 100, 200]); } catch (e) {}
+}
+/* Detecta pedidos nuevos por ID (no por cantidad) */
+function beepNew(P) {
+  const ids = new Set(P.map(d => d.id));
+  if (seen === null) { seen = ids; return; }          // primera carga: no suena
+  if ([...ids].some(id => !seen.has(id))) beep();     // hay un ID nuevo
+  seen = ids;
+}
 function po() {
   const P = orders.filter(d => { const o = d.data(); return !o.done && !o.anulado && !/^Promo/.test(o.tipo || ''); });
   $('po').innerHTML = P.length ? P.map(d => {
@@ -748,7 +804,7 @@ function po() {
       new Date(o.t).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' }) + '</span>' +
       '<button class="sm" data-i="' + d.id + '" data-a="d">✓ Confirmar: listo</button><button class="sm" data-i="' + d.id + '" data-a="n">Anular</button></div>';
   }).join('') : '<small style="color:var(--muted)">No hay pedidos pendientes. Los confirmados están en el historial.</small>';
-  beepNew(P.length);
+  beepNew(P);
 }
 const ens = () => live ? Promise.resolve() : Promise.all(SEED.map(m => setDoc(doc(db, 'menu', m.id), m))).then(() => { live = true; });
 function act(t) {
@@ -816,7 +872,7 @@ function showEst(st, tot) {
   const M = { p: ['⏳', 'Pedido pendiente', 'Estamos revisando tu pedido…'], r: ['✅', '¡Pedido listo!', 'Gracias por tu compra. ¡Que lo disfrutes!'], a: ['⚠️', 'Pedido anulado', 'Escríbenos por WhatsApp si necesitas ayuda.'], e: ['⚠️', 'No pudimos registrar tu pedido', 'Confírmalo por WhatsApp.'] }[st];
   est.className = 'est ' + st; est.style.display = '';
   est.innerHTML = '<span class="ic">' + M[0] + '</span><div><b>' + M[1] + '</b><small>' + M[2] + (tot != null ? ' · $' + Number(tot).toFixed(2) : '') + '</small></div><button aria-label="Cerrar" id="estx">✕</button>';
-  $('estx').onclick = clearEst;
+  $('estx').onclick = () => { clearEst(); if (sent) reset(); };
 }
 function clearEst() { if (unO) unO(); unO = null; est.style.display = 'none'; delete mem.pedido_activo; try { localStorage.removeItem('pedido_activo'); } catch (e) {} }
 function trackOrder(id, tot, resumed) {
@@ -848,7 +904,7 @@ function drawPromos() {
 $('pr').onclick = e => {
   const b = e.target.closest('[data-p]'); if (!b) return; e.preventDefault();
   const p = PROMOS.find(x => x.id == b.dataset.p), m = b.parentNode.querySelector('.pmsg'); if (!p) return;
-  const h = new Date().getHours();
+  const h = Math.floor(nowEC().mins / 60);
   if (!pOk(p)) { m.textContent = 'Esta promoción ya no está disponible.'; return; }
   if (hasH(p) && (h < +p.h1 || h >= +p.h2)) { m.textContent = 'Disponible de ' + fh(p.h1) + ' a ' + fh(p.h2) + '. ¡Te esperamos!'; return; }
   if (!lsg('cupon_' + p.id)) {
@@ -858,9 +914,9 @@ $('pr').onclick = e => {
   drawPromos();
 };
 /* Limpieza: al terminar una promoción (vencida o borrada) se eliminan todos sus cupones, canjeados o no. Solo corre en modo dueño. */
-let ADMIN = false, cleaning = false;
+let ADMIN = false, cleaning = false, pLoaded = false;
 async function cleanCoupons() {
-  if (!ADMIN || cleaning || !pLive) return;
+  if (!ADMIN || cleaning || !pLoaded) return;
   cleaning = true;
   try {
     const s = await getDocs(cc), now = Date.now();
@@ -876,7 +932,7 @@ async function cleanCoupons() {
   } catch (e) { console.error('Error limpiando cupones:', e); }
   cleaning = false;
 }
-onSnapshot(pc, s => { pLive = s.docs.length > 0; PROMOS = pLive ? s.docs.map(d => ({ ...d.data(), id: d.id })) : PSEED.slice(); drawPromos(); cleanCoupons(); }, e => console.error(e));
+onSnapshot(pc, s => { pLoaded = true; pLive = s.docs.length > 0; PROMOS = pLive ? s.docs.map(d => ({ ...d.data(), id: d.id })) : PSEED.slice(); drawPromos(); cleanCoupons(); }, e => console.error(e));
 drawPromos();
 
 /* Panel: promociones */
@@ -978,7 +1034,6 @@ $('rl').onclick = e => {
 if (new URLSearchParams(location.search).get('admin') === 'miapp123') {
   $('panel').classList.add('on'); $('pl').classList.add('on'); pm(); renderHoursAdmin();
   onSnapshot(query(oc, orderBy('t', 'desc'), limit(30)), s => { orders = s.docs; po(); }, e => console.error(e));
-  po();
   loadR(); loadCoupons();
   ADMIN = true; cleanCoupons(); setInterval(cleanCoupons, 36e5);
 }
