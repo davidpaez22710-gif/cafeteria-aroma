@@ -407,7 +407,7 @@ details p{margin:12px 0 0;color:var(--muted);max-width:60ch}
 <!-- SDKs de Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
-import { getFirestore, collection, setDoc, doc, deleteDoc, addDoc, updateDoc, onSnapshot, query, orderBy, limit, where, getDoc } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
+import { getFirestore, collection, setDoc, doc, deleteDoc, addDoc, updateDoc, onSnapshot, query, orderBy, limit, where, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBEN6C9n8rp4SzBXUqdZ4gvdUT9AMkenNQ",
@@ -857,7 +857,23 @@ $('pr').onclick = e => {
   }
   drawPromos();
 };
-onSnapshot(pc, s => { pLive = s.docs.length > 0; PROMOS = pLive ? s.docs.map(d => ({ ...d.data(), id: d.id })) : PSEED.slice(); drawPromos(); }, e => console.error(e));
+/* Limpieza: al terminar una promoción (vencida o borrada) se eliminan todos sus cupones, canjeados o no. Solo corre en modo dueño. */
+let ADMIN = false, cleaning = false;
+async function cleanCoupons() {
+  if (!ADMIN || cleaning || !pLive) return;
+  cleaning = true;
+  try {
+    const s = await getDocs(cc);
+    const dead = s.docs.filter(d => {
+      const c = d.data(), p = PROMOS.find(x => x.id == c.promoId);
+      if (!p) return true;
+      return !!p.expires && Date.now() > endOf(p);
+    });
+    await Promise.all(dead.map(d => deleteDoc(d.ref)));
+  } catch (e) { console.error('Error limpiando cupones:', e); }
+  cleaning = false;
+}
+onSnapshot(pc, s => { pLive = s.docs.length > 0; PROMOS = pLive ? s.docs.map(d => ({ ...d.data(), id: d.id })) : PSEED.slice(); drawPromos(); cleanCoupons(); }, e => console.error(e));
 drawPromos();
 
 /* Panel: promociones */
@@ -892,7 +908,7 @@ $('xadd').onclick = () => {
 function loadCoupons() {
   onSnapshot(query(cc, orderBy('t', 'desc'), limit(20)), s => {
     $('cpl').innerHTML = s.docs.length ? s.docs.map(d => { const c = d.data();
-      return '<div class="po" style="padding:8px 0"><div><b>' + E(c.code) + '</b> · ' + E(c.promo) + '<br><small style="color:var(--muted)">' + new Date(c.t).toLocaleString('es', { dateStyle: 'short', timeStyle: 'short' }) + (c.exp ? ' · vence ' + E(c.exp) : '') + '</small></div><span>' + (c.used ? '✓ Canjeado' : 'Disponible') + '</span></div>'; }).join('')
+      return '<div class="po" style="padding:8px 0"><div><b>' + E(c.code) + '</b> · ' + E(c.promo) + '<br><small style="color:var(--muted)">' + new Date(c.t).toLocaleString('es', { dateStyle: 'short', timeStyle: 'short' }) + (c.exp ? ' · vence ' + E(c.exp) : '') + '</small></div><span>' + (c.used ? '✓ Canjeado' : (c.exp && Date.now() > new Date(c.exp + 'T23:59:59').getTime() ? 'Vencido' : 'Disponible')) + '</span></div>'; }).join('')
       : '<small style="color:var(--muted)">Aún no hay cupones.</small>';
   }, e => console.error(e));
 }
@@ -961,6 +977,7 @@ if (new URLSearchParams(location.search).get('admin') === 'miapp123') {
   onSnapshot(query(oc, orderBy('t', 'desc'), limit(30)), s => { orders = s.docs; po(); }, e => console.error(e));
   po();
   loadR(); loadCoupons();
+  ADMIN = true; cleanCoupons(); setInterval(cleanCoupons, 36e5);
 }
 </script>
 </body>
