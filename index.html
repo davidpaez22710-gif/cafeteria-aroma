@@ -150,6 +150,7 @@ details p{margin:12px 0 0;color:var(--muted);max-width:60ch}
 .sr2 select:disabled,.sr2 input:disabled{opacity:.55;cursor:not-allowed}
 @media (max-width:760px){.nl a:not(.cta){display:none}.nl{gap:12px}}
 .item.out{opacity:.45}.item.out .add,.item.out .variant-box{display:none}.item.out small::after{content:" · Agotado"}
+#tk{display:none}@media print{body.tkp>*:not(#tk){display:none!important}body.tkp #tk{display:block!important}body.tkp{background:#fff!important}@page{margin:0}}
 #pl{display:none}#pl.on{display:inline}#panel{display:none}#panel.on{display:block}
 .pn{display:grid}.po,.pm{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 0;border-bottom:1px solid var(--line)}.po>div,.pm>span{flex:1;min-width:150px}
 .po.cancelled-lock{border-left:4px solid #ef4444;background:rgba(239,68,68,.08);padding-left:10px;opacity:1}
@@ -344,6 +345,17 @@ details p{margin:12px 0 0;color:var(--muted);max-width:60ch}
   <h2>Panel de <em>control</em></h2>
   <p class="sub">Esto solo lo ves tú: pedidos en vivo, estado de envío y menú sincronizado.</p>
   <div class="card"><h3>Pedidos pendientes</h3><div id="po" class="pn"></div></div>
+  <div class="card" style="margin-top:20px"><h3>Impresora de tickets</h3>
+    <p style="margin:0 0 12px;color:var(--muted);font-size:.88rem">Conecta una impresora térmica de recibos y cada pedido nuevo se imprimirá solo. Funciona en Chrome o Edge (Android o computador). Bluetooth: solo impresoras BLE. USB: con cable (en Android necesitas adaptador OTG).</p>
+    <div class="bts"><button class="sm" id="prble">Buscar por Bluetooth</button><button class="sm" id="prusb">Buscar por USB</button><button class="sm" id="prtest">Imprimir prueba</button><button class="sm" id="prout">Desconectar</button></div>
+    <p id="prst" style="margin:12px 0;color:var(--gold);font-size:.9rem">Sin impresora conectada.</p>
+    <div style="display:grid;gap:8px;font-size:.88rem;color:var(--muted)">
+      <label><input type="checkbox" id="prauto"> Imprimir automáticamente cuando llegue un pedido nuevo</label>
+      <label><input type="checkbox" id="prfb"> Si no hay impresora conectada, abrir la impresión del navegador</label>
+      <label><input type="checkbox" id="prnt"> Quitar tildes y ñ (actívalo si salen símbolos raros)</label>
+      <label>Ancho del papel <select id="prw" style="font:inherit;padding:6px 8px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:2px"><option value="32">58 mm</option><option value="48">80 mm</option></select></label>
+    </div>
+  </div>
   <div class="card" style="margin-top:20px"><h3>Ventas e historial</h3>
     <div class="pf" style="margin-top:8px;align-items:center"><label>Desde <input id="rf" type="date"></label><label>Hasta <input id="rt" type="date"></label></div>
     <div id="rsm"></div><small style="color:var(--muted)">Las ventas cuentan los pedidos que confirmaste como listos. Los pendientes se muestran aparte.</small>
@@ -791,8 +803,9 @@ function beep() {
 function beepNew(P) {
   const ids = new Set(P.map(d => d.id));
   if (seen === null) { seen = ids; return; }          // primera carga: no suena
-  if ([...ids].some(id => !seen.has(id))) beep();     // hay un ID nuevo
+  const nuevos = P.filter(d => !seen.has(d.id));      // IDs nuevos
   seen = ids;
+  if (nuevos.length) { beep(); autoPrint(nuevos); }
 }
 function po() {
   const P = orders.filter(d => { const o = d.data(); return !o.done && !o.anulado && !/^Promo/.test(o.tipo || ''); });
@@ -800,12 +813,246 @@ function po() {
     const o = d.data();
     return '<div class="po" style="border-left:4px solid #d6aa5c;padding-left:10px"><div><b>⏳ ' + E(o.tipo) + '</b> · Total: <b>$' + Number(o.total).toFixed(2) + '</b><br>' +
       '<small style="color:var(--muted)">' + E(o.items) + '</small><br><small><b>Pago:</b> ' + E(o.pago) + ' | <b>Detalle:</b> ' + E(o.detalle) + '</small>' +
-      (o.note ? '<br><small style="color:var(--gold)"><b>Nota:</b> ' + E(o.note) + '</small>' : '') + '</div><span>' +
+      (o.note ? '<br><small style="color:var(--gold)"><b>Nota:</b> ' + E(o.note) + '</small>' : '') + (PRINTED.has(d.id) ? '<br><small style="color:var(--muted)">🖨 Ticket impreso</small>' : '') + '</div><span>' +
       new Date(o.t).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' }) + '</span>' +
-      '<button class="sm" data-i="' + d.id + '" data-a="d">✓ Confirmar: listo</button><button class="sm" data-i="' + d.id + '" data-a="n">Anular</button></div>';
+      '<button class="sm" data-i="' + d.id + '" data-a="pr">🖨 Imprimir</button><button class="sm" data-i="' + d.id + '" data-a="d">✓ Confirmar: listo</button><button class="sm" data-i="' + d.id + '" data-a="n">Anular</button></div>';
   }).join('') : '<small style="color:var(--muted)">No hay pedidos pendientes. Los confirmados están en el historial.</small>';
   beepNew(P);
 }
+/* ===== Impresión de tickets: impresora térmica (Bluetooth BLE / USB, ESC-POS) o impresión del navegador ===== */
+const NEGOCIO = 'Café Aroma';   // ← nombre que aparece en el ticket
+const LS = {
+  get: (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } },
+  set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} }
+};
+const PR = { kind: '', dev: null, ch: null, chunk: 100, usb: null, queue: Promise.resolve() };
+let PRINTED = new Set();
+try { PRINTED = new Set(JSON.parse(LS.get('pr_done', '[]'))); } catch (e) {}
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const setPS = m => { const el = $('prst'); if (el) el.textContent = m; };
+const PW = () => LS.get('pr_w', '32') === '48' ? 48 : 32;
+const noAcc = s => String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+const clean = s => String(s == null ? '' : s)
+  .replace(/[\u{1F000}-\u{1FFFF}\u2600-\u27BF\uFE0F\u200D]/gu, '')
+  .replace(/[—–]/g, '-').replace(/[“”]/g, '"').replace(/[‘’]/g, "'").replace(/[•·]/g, '-').replace(/×/g, 'x');
+
+function wrap(t, w) {
+  const out = [];
+  String(t).split('\n').forEach(par => {
+    let line = '';
+    par.split(' ').forEach(word => {
+      while (word.length > w) { if (line) { out.push(line); line = ''; } out.push(word.slice(0, w)); word = word.slice(w); }
+      if (!line) line = word;
+      else if ((line + ' ' + word).length <= w) line += ' ' + word;
+      else { out.push(line); line = word; }
+    });
+    out.push(line);
+  });
+  return out;
+}
+function row(l, r, w) {
+  const lw = Math.max(8, w - r.length - 1);
+  return wrap(l, lw).map((x, i) => i == 0 ? x.padEnd(w - r.length) + r : '  ' + x);
+}
+/* Arma el ticket como lista de líneas {t, a (alineación), b (negrita), big (doble tamaño)} */
+function ticket(o, id) {
+  const w = PW(), L = [], dash = '-'.repeat(w), eq = '='.repeat(w);
+  const add = (t, a, b, big) => wrap(clean(t), big ? Math.floor(w / 2) : w).forEach(x => L.push({ t: x, a: a || 'l', b: !!b, big: !!big }));
+  const raw = (t, a, b) => L.push({ t, a: a || 'l', b: !!b, big: false });
+  add(NEGOCIO.toUpperCase(), 'c', true, true);
+  add('PEDIDO #' + String(id).slice(-4).toUpperCase(), 'c', true, true);
+  const d = new Date(o.t || Date.now());
+  add(d.toLocaleDateString('es') + '  ' + d.toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' }), 'c');
+  raw(eq);
+  add(o.tipo || '', 'l', true);
+  if (o.detalle) add(o.detalle, 'l', true, true);
+  raw(dash);
+  if (Array.isArray(o.lines) && o.lines.length) {
+    o.lines.forEach(x => {
+      row(clean(x.q + 'x ' + x.n), '$' + Number(x.t || 0).toFixed(2), w).forEach(r => raw(r, 'l', true));
+      if (x.v && x.v != 'Estándar') wrap('(' + clean(x.v) + ')', w - 3).forEach(v => raw('   ' + v));
+    });
+  } else add(o.items || '', 'l', true);
+  raw(dash);
+  row('TOTAL', '$' + Number(o.total || 0).toFixed(2), Math.floor(w / 2)).forEach(r => L.push({ t: r, a: 'l', b: true, big: true }));
+  if (o.pago) add('Pago: ' + o.pago, 'l');
+  if (o.note) { raw(dash); add('NOTA: ' + o.note, 'l', true); }
+  raw(eq);
+  add('¡Gracias por tu pedido!', 'c');
+  return L;
+}
+/* ESC/POS: tildes en CP858 (o sin tildes si la impresora muestra símbolos raros) */
+const CP858 = { 'á': 0xA0, 'é': 0x82, 'í': 0xA1, 'ó': 0xA2, 'ú': 0xA3, 'ñ': 0xA4, 'Ñ': 0xA5, '¿': 0xA8, '¡': 0xAD, 'ü': 0x81, 'Ü': 0x9A, 'Á': 0xB5, 'É': 0x90, 'Í': 0xD6, 'Ó': 0xE0, 'Ú': 0xE9, 'ç': 0x87, '€': 0xD5 };
+function enc(s, plain) {
+  if (plain) s = noAcc(s);
+  const out = [];
+  for (const ch of s) {
+    const c = ch.codePointAt(0);
+    if (c < 128) out.push(c);
+    else if (!plain && CP858[ch] !== undefined) out.push(CP858[ch]);
+    else { const f = noAcc(ch); out.push(f.length && f.charCodeAt(0) < 128 ? f.charCodeAt(0) : 0x3F); }
+  }
+  return out;
+}
+function escpos(o, id) {
+  const plain = LS.get('pr_nt', '0') === '1', B = [0x1B, 0x40];
+  if (!plain) B.push(0x1B, 0x74, 19);
+  ticket(o, id).forEach(x => {
+    B.push(0x1B, 0x61, x.a == 'c' ? 1 : x.a == 'r' ? 2 : 0, 0x1B, 0x45, x.b ? 1 : 0, 0x1D, 0x21, x.big ? 0x11 : 0);
+    enc(x.t, plain).forEach(c => B.push(c));
+    B.push(0x0A);
+  });
+  B.push(0x1B, 0x45, 0, 0x1D, 0x21, 0, 0x1B, 0x61, 0, 0x1B, 0x64, 4, 0x1D, 0x56, 66, 0);
+  return new Uint8Array(B);
+}
+/* Impresión normal del navegador (cualquier impresora instalada, o guardar como PDF) */
+function printBrowser(o, id) {
+  let el = $('tk');
+  if (!el) { el = document.createElement('div'); el.id = 'tk'; document.body.appendChild(el); }
+  const w = PW();
+  el.style.cssText = 'width:' + (w == 48 ? '76mm' : '52mm') + ';margin:0 auto;font:' + (w == 48 ? '12px' : '11px') + '/1.3 "Courier New",monospace;color:#000;background:#fff;white-space:pre';
+  el.innerHTML = ticket(o, id).map(x => '<div style="text-align:' + (x.a == 'c' ? 'center' : x.a == 'r' ? 'right' : 'left') + ';font-weight:' + (x.b ? 700 : 400) + ';font-size:' + (x.big ? '2em' : '1em') + '">' + (E(x.t) || ' ') + '</div>').join('');
+  document.body.classList.add('tkp');
+  const done = () => { document.body.classList.remove('tkp'); window.removeEventListener('afterprint', done); };
+  window.addEventListener('afterprint', done);
+  setTimeout(() => window.print(), 60);
+  setTimeout(done, 60000);
+}
+/* ---- Bluetooth (impresoras BLE; las de Bluetooth clásico no son compatibles con el navegador) ---- */
+const BLE_SERVICES = ['000018f0-0000-1000-8000-00805f9b34fb', 'e7810a71-73ae-499d-8c15-faa9aef0c3f2', '49535343-fe7d-4ae5-8fa9-9fafd205e455',
+  '0000ffe0-0000-1000-8000-00805f9b34fb', '0000ffe5-0000-1000-8000-00805f9b34fb', '0000ff00-0000-1000-8000-00805f9b34fb',
+  '0000fee7-0000-1000-8000-00805f9b34fb', '0000ae30-0000-1000-8000-00805f9b34fb', '0000af30-0000-1000-8000-00805f9b34fb',
+  '00001101-0000-1000-8000-00805f9b34fb', '0000fff0-0000-1000-8000-00805f9b34fb', '00010000-0000-1000-8000-00805f9b34fb'];
+async function openBLE(dev) {
+  const server = await dev.gatt.connect();
+  const services = await server.getPrimaryServices();
+  let ch = null;
+  for (const s of services) {
+    const cs = await s.getCharacteristics();
+    ch = cs.find(c => c.properties.writeWithoutResponse) || cs.find(c => c.properties.write);
+    if (ch) break;
+  }
+  if (!ch) { try { dev.gatt.disconnect(); } catch (e) {} throw new Error('Esta impresora no permite imprimir por Bluetooth desde el navegador. Prueba por USB.'); }
+  PR.kind = 'ble'; PR.dev = dev; PR.ch = ch; PR.usb = null;
+  if (!dev._pl) { dev._pl = true; dev.addEventListener('gattserverdisconnected', () => setPS('Impresora desconectada. Se reconectará al imprimir.')); }
+  LS.set('pr_ble', dev.id || ''); LS.set('pr_usb', '');
+  setPS('✓ Conectada por Bluetooth: ' + (dev.name || 'impresora'));
+}
+async function connectBLE() {
+  const dev = await navigator.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: BLE_SERVICES });
+  await openBLE(dev);
+}
+async function bleWrite(bytes) {
+  const c = PR.ch;
+  for (let i = 0; i < bytes.length; i += PR.chunk) {
+    const part = bytes.slice(i, i + PR.chunk);
+    try {
+      if (c.properties.writeWithoutResponse) await c.writeValueWithoutResponse(part); else await c.writeValue(part);
+    } catch (e) {
+      if (PR.chunk > 20) { PR.chunk = 20; return bleWrite(bytes.slice(i)); }   // la impresora no acepta paquetes grandes
+      throw e;
+    }
+    await sleep(25);
+  }
+}
+/* ---- USB ---- */
+async function openUSB(dev) {
+  await dev.open();
+  if (!dev.configuration) await dev.selectConfiguration(1);
+  let f = null;
+  const scan = cls => {
+    for (const itf of dev.configuration.interfaces) for (const alt of itf.alternates) {
+      if (cls != null && alt.interfaceClass !== cls) continue;
+      const ep = alt.endpoints.find(e => e.direction === 'out');
+      if (ep) return { itf: itf.interfaceNumber, alt: alt.alternateSetting, ep: ep.endpointNumber };
+    }
+    return null;
+  };
+  f = scan(7) || scan(null);
+  if (!f) throw new Error('No encontré un puerto de impresión en este dispositivo USB.');
+  await dev.claimInterface(f.itf);
+  if (f.alt) await dev.selectAlternateInterface(f.itf, f.alt);
+  PR.kind = 'usb'; PR.usb = { dev, ep: f.ep }; PR.dev = null; PR.ch = null;
+  LS.set('pr_usb', dev.vendorId + ':' + dev.productId); LS.set('pr_ble', '');
+  setPS('✓ Conectada por USB: ' + (dev.productName || 'impresora'));
+}
+async function connectUSB() {
+  const dev = await navigator.usb.requestDevice({ filters: [] });
+  await openUSB(dev);
+}
+async function ensurePrinter() {
+  if (PR.kind === 'ble' && PR.dev) { if (!PR.dev.gatt.connected) await openBLE(PR.dev); return true; }
+  if (PR.kind === 'usb' && PR.usb) return true;
+  return false;
+}
+async function sendBytes(bytes) {
+  if (PR.kind === 'ble') await bleWrite(bytes); else await PR.usb.dev.transferOut(PR.usb.ep, bytes);
+}
+function markPrinted(id) {
+  PRINTED.add(id);
+  LS.set('pr_done', JSON.stringify([...PRINTED].slice(-200)));
+  try { po(); } catch (e) {}
+}
+/* Cola de impresión: un ticket a la vez, en el orden en que llegaron los pedidos */
+function printOrder(d, manual) {
+  const o = d.data(), id = d.id;
+  PR.queue = PR.queue.then(async () => {
+    const fb = LS.get('pr_fb', '0') === '1';
+    try {
+      if (await ensurePrinter()) {
+        await sendBytes(escpos(o, id)); markPrinted(id); setPS('✓ Ticket enviado a la impresora.');
+      } else if (manual || fb) {
+        printBrowser(o, id); markPrinted(id);
+      } else setPS('⚠ Llegó un pedido pero no hay impresora conectada. Toca "Buscar por Bluetooth" o "Buscar por USB".');
+    } catch (e) {
+      console.error('Error de impresión:', e);
+      setPS('⚠ No se pudo imprimir: ' + (e.message || e));
+      if (manual || fb) { try { printBrowser(o, id); markPrinted(id); } catch (e2) {} }
+    }
+  });
+}
+function autoPrint(list) {
+  if (LS.get('pr_auto', '1') !== '1') return;
+  list.slice().reverse().forEach(d => printOrder(d, false));   // del más antiguo al más nuevo
+}
+/* Controles del panel */
+$('prble').onclick = async () => {
+  if (!navigator.bluetooth) { setPS('Este navegador no permite Bluetooth. Usa Chrome o Edge (Android o computador).'); return; }
+  try { setPS('Buscando impresoras Bluetooth…'); await connectBLE(); }
+  catch (e) { setPS(e.name == 'NotFoundError' ? 'No elegiste ninguna impresora.' : '⚠ ' + (e.message || e)); }
+};
+$('prusb').onclick = async () => {
+  if (!navigator.usb) { setPS('Este navegador no permite USB. Usa Chrome o Edge (Android o computador).'); return; }
+  try { setPS('Buscando impresoras USB…'); await connectUSB(); }
+  catch (e) { setPS(e.name == 'NotFoundError' ? 'No elegiste ninguna impresora.' : '⚠ ' + (e.message || e)); }
+};
+$('prtest').onclick = () => printOrder({ id: 'PRUEBA', data: () => ({ t: Date.now(), tipo: 'Para servir', detalle: 'Mesa 3', pago: 'Efectivo', note: 'Ticket de prueba', total: 7.5,
+  lines: [{ n: 'Capuchino', v: 'Estándar', q: 1, t: 3.5 }, { n: 'Croissant', v: 'Jamón y queso', q: 1, t: 4 }] }) }, true);
+$('prout').onclick = async () => {
+  try { if (PR.kind === 'ble' && PR.dev.gatt.connected) PR.dev.gatt.disconnect(); if (PR.kind === 'usb') await PR.usb.dev.close(); } catch (e) {}
+  PR.kind = ''; PR.dev = PR.ch = PR.usb = null; LS.set('pr_ble', ''); LS.set('pr_usb', ''); setPS('Sin impresora conectada.');
+};
+$('prauto').checked = LS.get('pr_auto', '1') === '1'; $('prauto').onchange = e => LS.set('pr_auto', e.target.checked ? '1' : '0');
+$('prfb').checked = LS.get('pr_fb', '0') === '1'; $('prfb').onchange = e => LS.set('pr_fb', e.target.checked ? '1' : '0');
+$('prnt').checked = LS.get('pr_nt', '0') === '1'; $('prnt').onchange = e => LS.set('pr_nt', e.target.checked ? '1' : '0');
+$('prw').value = LS.get('pr_w', '32'); $('prw').onchange = e => LS.set('pr_w', e.target.value);
+if (navigator.usb) navigator.usb.addEventListener('disconnect', e => { if (PR.usb && e.device === PR.usb.dev) { PR.kind = ''; PR.usb = null; setPS('Impresora USB desconectada.'); } });
+/* Reconecta sola la última impresora usada (solo en modo dueño) */
+if (new URLSearchParams(location.search).has('admin')) (async () => {
+  try {
+    if (navigator.usb) {
+      const saved = LS.get('pr_usb', ''), d = (await navigator.usb.getDevices()).find(x => x.vendorId + ':' + x.productId === saved);
+      if (d) { await openUSB(d); return; }
+    }
+  } catch (e) {}
+  try {
+    if (navigator.bluetooth && navigator.bluetooth.getDevices) {
+      const saved = LS.get('pr_ble', ''), d = (await navigator.bluetooth.getDevices()).find(x => x.id === saved);
+      if (d) await openBLE(d);
+    }
+  } catch (e) {}
+})();
+
 const ens = () => live ? Promise.resolve() : Promise.all(SEED.map(m => setDoc(doc(db, 'menu', m.id), m))).then(() => { live = true; });
 function act(t) {
   const id = t.dataset.i, a = t.dataset.a, m = MENU.find(x => x.id == id); if (!m) return;
@@ -831,6 +1078,7 @@ $('na').onclick = () => {
 $('ns').onclick = () => ens().then(() => { $('pmsg').textContent = 'Menú guardado en la base de datos.'; }).catch(fail);
 $('po').onclick = e => {
   const t = e.target, id = t.dataset.i; if (!id) return;
+  if (t.dataset.a == 'pr') { const d = orders.find(x => x.id == id); if (d) printOrder(d, true); return; }
   const r = doc(db, 'orders', id);
   const pr = t.dataset.a == 'n'
     ? updateDoc(r, { anulado: true, cancelledFromPending: true, cancelledAt: Date.now() })
