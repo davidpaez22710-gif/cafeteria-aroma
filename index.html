@@ -346,8 +346,9 @@ details p{margin:12px 0 0;color:var(--muted);max-width:60ch}
   <p class="sub">Esto solo lo ves tú: pedidos en vivo, estado de envío y menú sincronizado.</p>
   <div class="card"><h3>Pedidos pendientes</h3><div id="po" class="pn"></div></div>
   <div class="card" style="margin-top:20px"><h3>Impresora de tickets</h3>
-    <p style="margin:0 0 12px;color:var(--muted);font-size:.88rem">Conecta una impresora térmica de recibos y cada pedido nuevo se imprimirá solo. Funciona en Chrome o Edge (Android o computador). Bluetooth: solo impresoras BLE. USB: con cable (en Android necesitas adaptador OTG).</p>
-    <div class="bts"><button class="sm" id="prble">Buscar por Bluetooth</button><button class="sm" id="prusb">Buscar por USB</button><button class="sm" id="prtest">Imprimir prueba</button><button class="sm" id="prout">Desconectar</button></div>
+    <p style="margin:0 0 12px;color:var(--muted);font-size:.88rem">Conecta una impresora térmica de recibos y cada pedido nuevo se imprimirá solo. Funciona en Chrome o Edge (Android o computador). Bluetooth: solo impresoras BLE. USB: con cable (en Android necesitas adaptador OTG). QZ Tray: programa gratuito para Windows que usa la impresora ya instalada, sin cambiar su driver.</p>
+    <div class="bts"><button class="sm" id="prble">Buscar por Bluetooth</button><button class="sm" id="prusb">Buscar por USB</button><button class="sm" id="prqzb">Usar QZ Tray</button><button class="sm" id="prtest">Imprimir prueba</button><button class="sm" id="prout">Desconectar</button></div>
+    <div id="prqzrow" style="display:none;margin-top:12px;font-size:.88rem;color:var(--muted)"><label>Impresora instalada en Windows <select id="prqz" style="font:inherit;padding:6px 8px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:2px"></select></label></div>
     <p id="prst" style="margin:12px 0;color:var(--gold);font-size:.9rem">Sin impresora conectada.</p>
     <div style="display:grid;gap:8px;font-size:.88rem;color:var(--muted)">
       <label><input type="checkbox" id="prauto"> Imprimir automáticamente cuando llegue un pedido nuevo</label>
@@ -825,7 +826,7 @@ const LS = {
   get: (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } },
   set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} }
 };
-const PR = { kind: '', dev: null, ch: null, chunk: 100, usb: null, queue: Promise.resolve() };
+const PR = { kind: '', dev: null, ch: null, chunk: 100, usb: null, qz: '', queue: Promise.resolve() };
 let PRINTED = new Set();
 try { PRINTED = new Set(JSON.parse(LS.get('pr_done', '[]'))); } catch (e) {}
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -941,7 +942,7 @@ async function openBLE(dev) {
   if (!ch) { try { dev.gatt.disconnect(); } catch (e) {} throw new Error('Esta impresora no permite imprimir por Bluetooth desde el navegador. Prueba por USB.'); }
   PR.kind = 'ble'; PR.dev = dev; PR.ch = ch; PR.usb = null;
   if (!dev._pl) { dev._pl = true; dev.addEventListener('gattserverdisconnected', () => setPS('Impresora desconectada. Se reconectará al imprimir.')); }
-  LS.set('pr_ble', dev.id || ''); LS.set('pr_usb', '');
+  LS.set('pr_ble', dev.id || ''); LS.set('pr_usb', ''); LS.set('pr_qz', '');
   setPS('✓ Conectada por Bluetooth: ' + (dev.name || 'impresora'));
 }
 async function connectBLE() {
@@ -979,20 +980,49 @@ async function openUSB(dev) {
   await dev.claimInterface(f.itf);
   if (f.alt) await dev.selectAlternateInterface(f.itf, f.alt);
   PR.kind = 'usb'; PR.usb = { dev, ep: f.ep }; PR.dev = null; PR.ch = null;
-  LS.set('pr_usb', dev.vendorId + ':' + dev.productId); LS.set('pr_ble', '');
+  LS.set('pr_usb', dev.vendorId + ':' + dev.productId); LS.set('pr_ble', ''); LS.set('pr_qz', '');
   setPS('✓ Conectada por USB: ' + (dev.productName || 'impresora'));
 }
 async function connectUSB() {
   const dev = await navigator.usb.requestDevice({ filters: [] });
   await openUSB(dev);
 }
+/* ---- QZ Tray: imprime "crudo" por la impresora ya instalada en Windows (no cambia su driver; sirve con Generic / Text Only) ---- */
+function loadQZ() {
+  return new Promise((res, rej) => {
+    if (window.qz) return res(window.qz);
+    const sc = document.createElement('script');
+    sc.src = 'https://cdn.jsdelivr.net/npm/qz-tray@2.2.4/qz-tray.js';
+    sc.onload = () => window.qz ? res(window.qz) : rej(new Error('No cargó la librería de QZ Tray.'));
+    sc.onerror = () => rej(new Error('No se pudo descargar la librería de QZ Tray (revisa el internet).'));
+    document.head.appendChild(sc);
+  });
+}
+async function qzConnect() {
+  const q = await loadQZ();
+  if (!q.websocket.isActive()) await q.websocket.connect({ retries: 2, delay: 1 });
+  return q;
+}
+function qzUse(name) {
+  PR.kind = 'qz'; PR.qz = name; PR.dev = PR.ch = PR.usb = null;
+  LS.set('pr_qz', name); LS.set('pr_ble', ''); LS.set('pr_usb', '');
+  setPS('✓ Conectada por QZ Tray: ' + name);
+}
+async function qzList() {
+  const q = await qzConnect(), l = await q.printers.find();
+  return Array.isArray(l) ? l : [l];
+}
 async function ensurePrinter() {
+  if (PR.kind === 'qz' && PR.qz) { await qzConnect(); return true; }
   if (PR.kind === 'ble' && PR.dev) { if (!PR.dev.gatt.connected) await openBLE(PR.dev); return true; }
   if (PR.kind === 'usb' && PR.usb) return true;
   return false;
 }
 async function sendBytes(bytes) {
-  if (PR.kind === 'ble') await bleWrite(bytes); else await PR.usb.dev.transferOut(PR.usb.ep, bytes);
+  if (PR.kind === 'qz') {
+    const hex = Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+    await window.qz.print(window.qz.configs.create(PR.qz, { jobName: 'Ticket' }), [{ type: 'raw', format: 'command', flavor: 'hex', data: hex }]);
+  } else if (PR.kind === 'ble') await bleWrite(bytes); else await PR.usb.dev.transferOut(PR.usb.ep, bytes);
 }
 function markPrinted(id) {
   PRINTED.add(id);
@@ -1032,11 +1062,22 @@ $('prusb').onclick = async () => {
   try { setPS('Buscando impresoras USB…'); await connectUSB(); }
   catch (e) { setPS(e.name == 'NotFoundError' ? 'No elegiste ninguna impresora.' : '⚠ ' + (e.message || e)); }
 };
+$('prqzb').onclick = async () => {
+  try {
+    setPS('Conectando con QZ Tray… (si QZ muestra un aviso, toca Allow y marca "Remember this decision")');
+    const names = await qzList(), sel = $('prqz');
+    sel.innerHTML = '<option value="">— elige tu impresora —</option>' + names.map(n => '<option>' + E(n) + '</option>').join('');
+    $('prqzrow').style.display = 'block';
+    const saved = LS.get('pr_qz', '');
+    if (saved && names.includes(saved)) { sel.value = saved; qzUse(saved); } else setPS('QZ Tray conectado. Elige tu impresora en la lista.');
+  } catch (e) { setPS('⚠ No pude conectar con QZ Tray. ¿Está instalado y abierto (ícono junto al reloj)? ' + (e && e.message ? e.message : '')); }
+};
+$('prqz').onchange = e => { if (e.target.value) qzUse(e.target.value); };
 $('prtest').onclick = () => printOrder({ id: 'PRUEBA', data: () => ({ t: Date.now(), tipo: 'Para servir', detalle: 'Mesa 3', pago: 'Efectivo', note: 'Ticket de prueba', total: 7.5,
   lines: [{ n: 'Capuchino', v: 'Estándar', q: 1, t: 3.5 }, { n: 'Croissant', v: 'Jamón y queso', q: 1, t: 4 }] }) }, true);
 $('prout').onclick = async () => {
   try { if (PR.kind === 'ble' && PR.dev.gatt.connected) PR.dev.gatt.disconnect(); if (PR.kind === 'usb') await PR.usb.dev.close(); } catch (e) {}
-  PR.kind = ''; PR.dev = PR.ch = PR.usb = null; LS.set('pr_ble', ''); LS.set('pr_usb', ''); setPS('Sin impresora conectada.');
+  PR.kind = ''; PR.qz = ''; PR.dev = PR.ch = PR.usb = null; LS.set('pr_ble', ''); LS.set('pr_usb', ''); LS.set('pr_qz', ''); setPS('Sin impresora conectada.');
 };
 $('prauto').checked = LS.get('pr_auto', '1') === '1'; $('prauto').onchange = e => LS.set('pr_auto', e.target.checked ? '1' : '0');
 $('prfb').checked = LS.get('pr_fb', '0') === '1'; $('prfb').onchange = e => LS.set('pr_fb', e.target.checked ? '1' : '0');
@@ -1045,6 +1086,10 @@ $('prw').value = LS.get('pr_w', '32'); $('prw').onchange = e => LS.set('pr_w', e
 if (navigator.usb) navigator.usb.addEventListener('disconnect', e => { if (PR.usb && e.device === PR.usb.dev) { PR.kind = ''; PR.usb = null; setPS('Impresora USB desconectada.'); } });
 /* Reconecta sola la última impresora usada (solo en modo dueño) */
 if (new URLSearchParams(location.search).has('admin')) (async () => {
+  try {
+    const saved = LS.get('pr_qz', '');
+    if (saved) { const names = await qzList(); if (names.includes(saved)) { qzUse(saved); return; } }
+  } catch (e) {}
   try {
     if (navigator.usb) {
       const saved = LS.get('pr_usb', ''), d = (await navigator.usb.getDevices()).find(x => x.vendorId + ':' + x.productId === saved);
